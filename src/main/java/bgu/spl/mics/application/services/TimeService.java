@@ -8,6 +8,9 @@ import bgu.spl.mics.MicroService;
  */
 public class TimeService extends MicroService {
 
+    int TickTime;
+    int Duration;
+
     /**
      * Constructor for TimeService.
      *
@@ -15,8 +18,9 @@ public class TimeService extends MicroService {
      * @param Duration  The total number of ticks before the service terminates.
      */
     public TimeService(int TickTime, int Duration) {
-        super("Change_This_Name");
-        // TODO Implement this
+        super("TimeService");
+        TickTime = TickTime;
+        Duration = Duration;
     }
 
     /**
@@ -25,6 +29,14 @@ public class TimeService extends MicroService {
      */
     @Override
     protected void initialize() {
-        // TODO Implement this
+        for (int i = 1; i <= Duration; i++) {
+            try {
+                Thread.sleep(TickTime);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            this.messageBus.sendBroadcast(new TickBroadcast(i, TickTime)); 
+        }
+        terminate();
     }
 }

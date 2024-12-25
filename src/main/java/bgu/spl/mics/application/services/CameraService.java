@@ -11,14 +11,17 @@ import bgu.spl.mics.MicroService;
  */
 public class CameraService extends MicroService {
 
+    final Camera camera;
+
     /**
      * Constructor for CameraService.
      *
      * @param camera The Camera object that this service will use to detect objects.
      */
     public CameraService(Camera camera) {
-        super("Change_This_Name");
-        // TODO Implement this
+        super("CameraService" + camera.getId());
+        this.camera = camera;
+    
     }
 
     /**
@@ -28,6 +31,18 @@ public class CameraService extends MicroService {
      */
     @Override
     protected void initialize() {
-        // TODO Implement this
+        this.subscribeBroadcast(TickBroadcast.class, (TickBroadcast tick) -> {
+            int curentTime= tick.getTime();
+            List<Stamped<DetectedObject>> detectedObjects = camera.getDetectedObjectsbyTime(curentTime);
+            for (Stamped<DetectedObject> list : detectedObjects) {
+                sendEvent(new DetectObjectsEvent(list));
+
+                // להבין מה בדיוק שולחים ולמי
+                // פה אני שולחת רשימה  
+            }
+        });
+        this.subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast terminate) -> {
+            terminate();
+        });
     }
 }

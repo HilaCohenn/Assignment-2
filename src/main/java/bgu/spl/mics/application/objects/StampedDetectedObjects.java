@@ -6,4 +6,8 @@ package bgu.spl.mics.application.objects;
  */
 public class StampedDetectedObjects {
     // TODO: Define fields and methods.
+
+    public getTime(){
+        //todo: implement
+    }
 }
