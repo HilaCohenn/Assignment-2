@@ -18,6 +18,23 @@ public class TrackedObject {
         this.id = id;
         this.time = time;
         this.description = description;
-        this.cloudpoints = new ArrayList<>(coordinates); //safe? already known?
+        this.cloudpoints = coordinates;
         }
+
+        public String getId() {
+        return id;
+        }
+
+        public int getTime() {
+        return time;
+        }   
+
+        public String getDescription() {
+        return description;
+        }
+
+        public List<CloudPoint> getCloudPoints() {
+        return cloudpoints;
+        }
+
 }

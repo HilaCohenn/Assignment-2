@@ -57,6 +57,6 @@ public class CameraService extends MicroService {
         this.subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast terminates) -> {
            this.camera.status=STATUS.DOWN;
            terminate();
-        });
+        });//check who is the sender
     }
 }

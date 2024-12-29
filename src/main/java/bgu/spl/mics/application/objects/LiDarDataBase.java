@@ -47,6 +47,7 @@ public class LiDarDataBase {
         this.cloudPoints = gson.fromJson(jsonArray, objectListType);
     }
 
+    //get the cloud points of a specific object
     public StampedCloudPoints getCloudPoint(DetectedObject d,int time) {
             for (StampedCloudPoints cloudPoint : this.cloudPoints) {
             if (cloudPoint.getId().equals(d.getId())&&cloudPoint.getTime()==time) {

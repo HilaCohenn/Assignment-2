@@ -79,7 +79,7 @@ public STATUS getStatus() {
 public  StampedDetectedObjects getDetectedObjectsbyTime(int time) {
     StampedDetectedObjects detectedObjects =null;
     for (StampedDetectedObjects detectedObject : this.detectedObjectsList) {
-        if (detectedObject.getTime() == time - frequency) {
+        if (detectedObject.getTime() == time - frequency) { //<=
             detectedObjects=detectedObject; 
         }
     }
