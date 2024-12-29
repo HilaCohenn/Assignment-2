@@ -2,20 +2,17 @@ package bgu.spl.mics;
 
 
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 
 public  class FileReaderUtil<T>{
-//    private String filePath;
-////    private static Gson gson;
-//
-//    public FileReaderUtil(String filePath) {
-//        this.filePath = filePath;
-////        this.gson = new Gson();
-//    }
+
 
     public static JsonObject readJson(String filePath) {
         try(FileReader reader=new FileReader(filePath)){
@@ -28,25 +25,25 @@ public  class FileReaderUtil<T>{
         return null;
     }
 
-//    public List<T> readJsonToList(String filePath) {
-//        try (FileReader reader = new FileReader(filePath)) {
-//            Type dataListType = new TypeToken<ArrayList<T>>(){}.getType();
-//            List<T> dataList = gson.fromJson(new FileReader(filePath), dataListType);
-//            return dataList;
-//        } catch (FileNotFoundException e) {
-//            System.out.println("File not found: " + filePath);
-//        } catch (IOException e) {
-//            System.out.println("Error reading file: " + filePath);
-//        }
-//        // Return null if an error occurs
-//        return null;
-//    }
+    public static JsonArray readJsonArray(String filePath) {
+        try(FileReader reader=new FileReader(filePath)){
+            JsonArray jsonArray = JsonParser.parseReader(reader).getAsJsonArray();
+            return jsonArray;
+        }
+        catch (Exception e) {
+            System.out.println("Error reading file: " + filePath);
+        }
+        return null;
+    }
 
-//    public static List<T>  readJsonToList(JsonObject jsonObject) {
-//        Gson gson = new Gson();
-//            Type dataListType = new TypeToken<ArrayList<T>>(){}.getType();
-//            List<T> dataList = gson.fromJson(jsonObject, dataListType);
-//            return dataList;
-//    }
+     public static void writeJson(String json, String filePath) {
+        try (FileWriter writer = new FileWriter(filePath)) {
+            // Convert object to JSON and write to file
+            writer.write(json);
+        } catch (IOException e) {
+            System.out.println("Error writing file: " + filePath);
+        }
+    }
+
 
 }
