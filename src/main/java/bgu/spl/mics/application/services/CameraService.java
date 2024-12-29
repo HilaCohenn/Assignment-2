@@ -1,6 +1,13 @@
 package bgu.spl.mics.application.services;
 
-import bgu.spl.mics.MicroService;
+import bgu.spl.mics.application.objects.Camera;
+import bgu.spl.mics.application.objects.StampedDetectedObjects;
+import bgu.spl.mics.*;
+import java.util.concurrent.ConcurrentHashMap;
+import bgu.spl.mics.Future;
+import bgu.spl.mics.application.messages.DetectObjectsEvent;
+import bgu.spl.mics.application.messages.TickBroadcast;
+
 
 /**
  * CameraService is responsible for processing data from the camera and
@@ -11,7 +18,9 @@ import bgu.spl.mics.MicroService;
  */
 public class CameraService extends MicroService {
 
-    final Camera camera;
+    private final Camera camera;
+    private final ConcurrentHashMap<Event<?>,Future<?>> eventFutures;
+    
 
     /**
      * Constructor for CameraService.
@@ -21,6 +30,7 @@ public class CameraService extends MicroService {
     public CameraService(Camera camera) {
         super("CameraService" + camera.getId());
         this.camera = camera;
+        this.eventFutures = new ConcurrentHashMap<>();
     
     }
 
@@ -32,17 +42,20 @@ public class CameraService extends MicroService {
     @Override
     protected void initialize() {
         this.subscribeBroadcast(TickBroadcast.class, (TickBroadcast tick) -> {
-            int curentTime= tick.getTime();
-            List<Stamped<DetectedObject>> detectedObjects = camera.getDetectedObjectsbyTime(curentTime);
-            for (Stamped<DetectedObject> list : detectedObjects) {
-                sendEvent(new DetectObjectsEvent(list));
-
-                // להבין מה בדיוק שולחים ולמי
-                // פה אני שולחת רשימה  
+            int curentTime= tick.getTick();//getTime
+            StampedDetectedObjects detectedObjects = camera.getDetectedObjectsbyTime(curentTime);
+            if(detectedObjects != null){
+                DetectObjectsEvent e = new DetectObjectsEvent(detectedObjects);
+                eventFutures.put(e,sendEvent(e));
             }
-        });
-        this.subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast terminate) -> {
-            terminate();
-        });
+            });
+    //this.subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast crashed) -> {
+    //this.camera.status=STATUS.DOWN;//check errors
+    //terminate();
+    //});
+     // this.subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast terminate) -> {
+       //     this.camera.status=STATUS.DOWN;
+         //   terminate();
+        //});
     }
 }

@@ -1,5 +1,4 @@
 package bgu.spl.mics;
-import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -10,7 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * All other methods and members you add the class must be private.
  */
 public class MessageBusImpl implements MessageBus {
-	    private static MessageBusImpl instance = null;
+	    private static MessageBusImpl instance = new MessageBusImpl();
     	private final ConcurrentMap<MicroService, BlockingQueue<Message>> microServiceQueues;
     	private final ConcurrentMap<Class<? extends Message>, ConcurrentLinkedQueue<MicroService>> subscriptions;
     	private final ConcurrentMap<Event<?>, Future<?>> eventFutures;
@@ -23,13 +22,9 @@ public class MessageBusImpl implements MessageBus {
        	roundRobinCounters = new ConcurrentHashMap<>();
     }
 
-	public synchronized static MessageBusImpl getInstance() {
-        if (instance == null) {
-            if (instance == null) {
-                instance = new MessageBusImpl();
-            }
-        }
+	public static MessageBusImpl getInstance() {
         return instance;
+        //another class?
     }
 
 	@Override
@@ -89,10 +84,10 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public synchronized void unregister(MicroService m) {
-        microServiceQueues.remove(m);
-        subscriptions.values().forEach(queue -> queue.remove(m));
-       // roundRobinCounters?
-		 if (queue != null) {
+        BlockingQueue<Message> queue = microServiceQueues.remove(m);
+        subscriptions.values().forEach(queues -> queues.remove(m));
+        //handle round robin counters?
+		if (queue != null) {
         for (Message message : queue) {
             if (message instanceof Event) {
                 Future<?> future = eventFutures.remove(message);

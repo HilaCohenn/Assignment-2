@@ -1,4 +1,6 @@
 package bgu.spl.mics;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The MicroService is an abstract class that any micro-service in the system
@@ -152,7 +154,7 @@ public abstract class MicroService implements Runnable {
      */
     @Override
     public final void run() {
-        messageBus.register(this); //check if done in intialize
+        messageBus.register(this); 
         initialize();
         while (!terminated) {
             try {

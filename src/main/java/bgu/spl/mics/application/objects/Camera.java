@@ -1,5 +1,19 @@
 package bgu.spl.mics.application.objects;
 
+
+import bgu.spl.mics.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
+
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+
+
+
 /**
  * Represents a camera sensor on the robot.
  * Responsible for detecting objects in the environment.
@@ -16,20 +30,41 @@ public class Camera {
 private static int idCounter=0;
 private final int id;
 private final int frequency;
-private Status status;
-private final List<Stamped<DetectedObject>> detectedObjectsList;
+public STATUS status;
+private final List<StampedDetectedObjects> detectedObjectsList;
 
 /**
  * Constructor for Camera.
  *
  * @param frequency The time interval at which the camera sends new events.
  */ 
-public Camera(int frequency) {
+public Camera(int frequency,String path) {
     this.id = ++idCounter;
     this.frequency = frequency;
-    this.status = Status.UP;
+    this.status = STATUS.UP;
     this.detectedObjectsList = new ArrayList<>();
-
+    initDetectedObjects(path);
+    
+}
+private void initDetectedObjects (String path){
+    Gson gson = new Gson();
+    JsonObject o = FileReaderUtil.readJson(path);
+    String name = "camera" + this.id;
+    // Check if the camera exists in the JSON object
+    if (o.has(name)) {
+        JsonArray cameraData = o.getAsJsonArray(name);
+        // Iterate over the array of camera data
+        for (int i = 0; i < cameraData.size(); i++) {
+            JsonObject cameraEntry = cameraData.get(i).getAsJsonObject();
+            int time = cameraEntry.get("time").getAsInt();
+        // Get the detected objects and parse them into DetectedObject list
+            Type objectListType = new TypeToken<List<DetectedObject>>() {}.getType();
+            List<DetectedObject> detectedObjects = gson.fromJson(cameraEntry.getAsJsonArray("detectedObjects"), objectListType);
+        // Create StampedDetectedObjects instance and add it to the list
+            StampedDetectedObjects stampedDetectedObjects = new StampedDetectedObjects(time, detectedObjects);
+            this.detectedObjectsList.add(stampedDetectedObjects);
+        }
+    }
 }
 
 public int getId() {
@@ -37,18 +72,18 @@ public int getId() {
 }
 
 
-public Status getStatus() {
+public STATUS getStatus() {
     return status;
 
 }
 
-public  List<Stamped<DetectedObject>> getDetectedObjectsbyTime(int time) {
-    List<Stamped<DetectedObject>> detectedObjects = new ArrayList<>();
-    for (Stamped<DetectedObject> detectedObject : detectedObjectsList) {
-        if (detectedObject.getTime() <= time || detectedObject.getTime() >= time - frequency) {
-            detectedObjects.add(detectedObject);
+public  StampedDetectedObjects getDetectedObjectsbyTime(int time) {
+    StampedDetectedObjects detectedObjects =null;
+    for (StampedDetectedObjects detectedObject : this.detectedObjectsList) {
+        if (detectedObject.getTime() == time - frequency) {
+            detectedObjects=detectedObject; 
         }
     }
     return detectedObjects;
-    
+    }
 }

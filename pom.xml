@@ -29,6 +29,12 @@
             <version>5.11.4</version>
             <scope>test</scope>
         </dependency>
+  
+    <dependency>
+      <groupId>org.faktorips</groupId>
+      <artifactId>faktorips-runtime-productdataservice</artifactId>
+      <version>25.1.0</version>
+    </dependency>
   </dependencies>
     <build>
         <plugins>

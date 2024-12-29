@@ -39,6 +39,8 @@ public class Future<T> {
     	// Thread.currentThread().interrupt();
        // return null;
 	}
+	return null;
+	}
 	
 	/**
      * Resolves the result of this Future object.
@@ -77,6 +79,7 @@ public class Future<T> {
 		{
 			//need to be done
 		}
+		return null;
 	}
 
 }

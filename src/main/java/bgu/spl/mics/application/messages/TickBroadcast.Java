@@ -1,22 +1,22 @@
-package bgu.spl.mics.application.services;
+package bgu.spl.mics.application.messages;
 
-import bgu.spl.mics.MicroService;
 
-public class TickBroadcast extends Broadcast{
+import bgu.spl.mics.Broadcast;
+
+public class TickBroadcast implements Broadcast{
 
     private final int tick;
-    private final int TickTime;
+
     
-    public TickBroadcast(int tick, int TickTime){
+    public TickBroadcast(int tick){
         this.tick = tick;
-        this.TickTime = TickTime;
     }
 
     public int getTick(){
         return tick;
     }
 
-    public int getTime(){
-        return tick*TickTime;
-    }    
+    // public int getTime(){
+    //     return tick*TickTime;
+    // }    
 }
