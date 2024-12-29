@@ -1,12 +1,13 @@
 package bgu.spl.mics.application.services;
 
 import bgu.spl.mics.application.objects.Camera;
+import bgu.spl.mics.application.objects.STATUS;
 import bgu.spl.mics.application.objects.StampedDetectedObjects;
 import bgu.spl.mics.*;
 import java.util.concurrent.ConcurrentHashMap;
-import bgu.spl.mics.Future;
-import bgu.spl.mics.application.messages.DetectObjectsEvent;
-import bgu.spl.mics.application.messages.TickBroadcast;
+
+import bgu.spl.mics.application.messages.*;
+
 
 
 /**
@@ -45,17 +46,17 @@ public class CameraService extends MicroService {
             int curentTime= tick.getTick();//getTime
             StampedDetectedObjects detectedObjects = camera.getDetectedObjectsbyTime(curentTime);
             if(detectedObjects != null){
-                DetectObjectsEvent e = new DetectObjectsEvent(detectedObjects);
+                DetectObjectsEvent e = new DetectObjectsEvent(this.camera.getId(),detectedObjects);
                 eventFutures.put(e,sendEvent(e));
             }
-            });
-    //this.subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast crashed) -> {
-    //this.camera.status=STATUS.DOWN;//check errors
-    //terminate();
-    //});
-     // this.subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast terminate) -> {
-       //     this.camera.status=STATUS.DOWN;
-         //   terminate();
-        //});
+        });
+        this.subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast crashed) -> {
+        this.camera.status=STATUS.ERROR;//check errors
+        terminate();
+        });
+        this.subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast terminates) -> {
+           this.camera.status=STATUS.DOWN;
+           terminate();
+        });
     }
 }

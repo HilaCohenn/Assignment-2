@@ -71,7 +71,6 @@ public int getId() {
     return id;
 }
 
-
 public STATUS getStatus() {
     return status;
 
