@@ -5,19 +5,18 @@ import bgu.spl.mics.application.objects.StampedDetectedObjects;
 
 public class DetectObjectsEvent implements Event {
     private StampedDetectedObjects detectedObjects; 
-    private int senderId;
+    private String senderName;
 
-    public DetectObjectsEvent(int senderId, StampedDetectedObjects detectedObjects){
+    public DetectObjectsEvent(String senderName, StampedDetectedObjects detectedObjects){
         this.detectedObjects = detectedObjects;
-        this.senderId = senderId;
+        this.senderName = senderName;
     }
 
     public StampedDetectedObjects getDetectedObjects() {
         return detectedObjects;
     }
-    public int getSenderId() {
-        return senderId;
+    public String getsenderName() {
+        return senderName;
     }
-  
-//id or name?
+
 }

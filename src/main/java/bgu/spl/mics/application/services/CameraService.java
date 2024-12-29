@@ -46,7 +46,7 @@ public class CameraService extends MicroService {
             int curentTime= tick.getTick();//getTime
             StampedDetectedObjects detectedObjects = camera.getDetectedObjectsbyTime(curentTime);
             if(detectedObjects != null){
-                DetectObjectsEvent e = new DetectObjectsEvent(this.camera.getId(),detectedObjects);
+                DetectObjectsEvent e = new DetectObjectsEvent(this.getName(),detectedObjects);
                 eventFutures.put(e,sendEvent(e));
             }
         });
