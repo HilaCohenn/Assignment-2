@@ -17,5 +17,8 @@ public class LiDarWorkerTracker {
         this.id = id;
         this.frequency = frequency;
         this.status = STATUS.UP;
+        
+        
     }
+    
 }
