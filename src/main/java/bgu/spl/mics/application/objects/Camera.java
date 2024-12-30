@@ -27,7 +27,6 @@ public class Camera {
 // detectedObjectsList: List of Stamped DetectedObject – Time-stamped objects the
 // camera detected.
 
-private static int idCounter=0;
 private final int id;
 private final int frequency;
 public STATUS status;
@@ -38,8 +37,8 @@ private final List<StampedDetectedObjects> detectedObjectsList;
  *
  * @param frequency The time interval at which the camera sends new events.
  */ 
-public Camera(int frequency,String path) {
-    this.id = ++idCounter;
+public Camera(int id, int frequency,String path) {
+    this.id = id;
     this.frequency = frequency;
     this.status = STATUS.UP;
     this.detectedObjectsList = new ArrayList<>();
@@ -79,7 +78,7 @@ public STATUS getStatus() {
 public  StampedDetectedObjects getDetectedObjectsbyTime(int time) {
     StampedDetectedObjects detectedObjects =null;
     for (StampedDetectedObjects detectedObject : this.detectedObjectsList) {
-        if (detectedObject.getTime() == time - frequency) { //<=
+        if (detectedObject.getTime() == time - frequency) { 
             detectedObjects=detectedObject; 
         }
     }

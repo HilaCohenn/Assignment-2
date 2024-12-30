@@ -43,7 +43,7 @@ public class CameraService extends MicroService {
     @Override
     protected void initialize() {
         this.subscribeBroadcast(TickBroadcast.class, (TickBroadcast tick) -> {
-            int curentTime= tick.getTick();//getTime
+            int curentTime= tick.getTick();
             StampedDetectedObjects detectedObjects = camera.getDetectedObjectsbyTime(curentTime);
             if(detectedObjects != null){
                 DetectObjectsEvent e = new DetectObjectsEvent(this.getName(),detectedObjects);
