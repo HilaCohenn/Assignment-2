@@ -1,9 +1,7 @@
 package bgu.spl.mics.application.services;
 
 import bgu.spl.mics.application.objects.LiDarWorkerTracker;
-import bgu.spl.mics.application.objects.Camera;
 import bgu.spl.mics.application.objects.STATUS;
-import bgu.spl.mics.application.objects.StampedDetectedObjects;
 import bgu.spl.mics.*;
 import bgu.spl.mics.application.objects.TrackedObject;
 import java.util.concurrent.ConcurrentHashMap;
