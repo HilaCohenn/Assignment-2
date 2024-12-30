@@ -3,6 +3,16 @@ package bgu.spl.mics.application.services;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.objects.LiDarWorkerTracker;
 
+package bgu.spl.mics.application.services;
+
+import bgu.spl.mics.application.objects.Camera;
+import bgu.spl.mics.application.objects.STATUS;
+import bgu.spl.mics.application.objects.StampedDetectedObjects;
+import bgu.spl.mics.*;
+import java.util.concurrent.ConcurrentHashMap;
+
+import bgu.spl.mics.application.messages.*;
+
 /**
  * LiDarService is responsible for processing data from the LiDAR sensor and
  * sending TrackedObjectsEvents to the FusionSLAM service.
@@ -13,14 +23,17 @@ import bgu.spl.mics.application.objects.LiDarWorkerTracker;
  */
 public class LiDarService extends MicroService {
 
+    private final LiDarWorkerTracker LiDarWorkerTracker;
+    private final ConcurrentHashMap<Event<?>,Future<?>> eventFutures;
     /**
      * Constructor for LiDarService.
      *
      * @param LiDarWorkerTracker A LiDAR Tracker worker object that this service will use to process data.
      */
     public LiDarService(LiDarWorkerTracker LiDarWorkerTracker) {
-        super("Change_This_Name");
-        // TODO Implement this
+        super("LiDarService" + LiDarWorkerTracker.getId());
+        this.LiDarWorkerTracker = LiDarWorkerTracker;
+        this.eventFutures = new ConcurrentHashMap<>();
     }
 
     /**
@@ -30,6 +43,28 @@ public class LiDarService extends MicroService {
      */
     @Override
     protected void initialize() {
-        // TODO Implement this
+        this.subscribeBroadcast(TickBroadcast.class, (TickBroadcast tick) -> {
+            List<TrackedObject> recentObjects = LiDarWorkerTracker.getTrackedObjectsbyTime(tick.getTick());
+            if (recentObjects != null) {
+                TrackedObjectsEvent e = new TrackedObjectsEvent(this.name, recentObjects);
+                eventFutures.put(e,sendEvent(e));
+            }
+        }
+        );
+
+        this.subscribeEvent(DetectObjectsEvent.class, (DetectObjectsEvent detect) -> {
+            LiDarWorkerTracker.addToLastTrackedObjects(detect.getDetectedObjects());
+            complete(detect, true);
+            
+        });
+        this.subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast crashed) -> {
+            this.LiDarWorkerTracker.status=STATUS.ERROR;//check errors
+            terminate();
+        });
+
+        this.subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast terminates) -> {
+            this.LiDarWorkerTracker.status=STATUS.DOWN;
+            terminate();
+         });//check who is the sender
     }
 }
