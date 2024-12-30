@@ -1,6 +1,7 @@
 package bgu.spl.mics.application.messages;
 import bgu.spl.mics.Event;
-import bgu.spl.mics.application.objects.StampedDetectedObjects;
+import java.util.List;
+import bgu.spl.mics.application.objects.TrackedObject;
 
 
 public class TrackedObjectsEvent implements Event {
@@ -8,7 +9,7 @@ public class TrackedObjectsEvent implements Event {
     private String senderName;
 
     public TrackedObjectsEvent(String senderName, List<TrackedObject> trackedObjects){
-        this.lastTrackedObjects = trackedObjects;
+        this.trackedObjects = trackedObjects;
         this.senderName = senderName;
     }
 
