@@ -1,12 +1,12 @@
 package bgu.spl.mics.application.objects;
 
 
-import bgu.spl.mics.*;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
-
+import bgu.spl.mics.FileReaderUtil;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
