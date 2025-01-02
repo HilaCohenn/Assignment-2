@@ -1,4 +1,7 @@
 package bgu.spl.mics.application.objects;
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * Manages the fusion of sensor data for simultaneous localization and mapping (SLAM).
@@ -34,7 +37,7 @@ public class FusionSlam {
         }
     }
 
-    public static boolean landMarkExists(String id){
+    public boolean landMarkExists(String id){
         for (LandMark landMark : landmarks){
             if (landMark.getId().equals(id)){
                 return true;
@@ -43,31 +46,33 @@ public class FusionSlam {
         return false;
     }
 
-    public static void updateLandmark(TrackedObject trackedObject){
+    public void updateLandmark(TrackedObject trackedObject){
         for (LandMark landMark : landmarks){
             if (landMark.getId().equals(trackedObject.getId())){
                 updateCoordinates(landMark, trackedObject.getCloudPoints());
-                landMark.setCoordinates(CoordinateTransformer(trackedObject.getCoordinates()));
+                landMark.setCoordinates(coordinateTransformer(trackedObject.getCloudPoints(), getPoseByTime(trackedObject.getTime())));
             }
         }
     }
 
-    public static void addLandMark(TrackedObject trackedObject){
+    public void addLandMark(TrackedObject trackedObject){
         Pose pose = getPoseByTime(trackedObject.getTime());
-        LandMark landMark = new LandMark(trackedObject.getId(), trackedObject.getDescription(), CoordinateTransformer(trackedObject.getCoordinates(), pose));
+        LandMark landMark = new LandMark(trackedObject.getId(), trackedObject.getDescription(), coordinateTransformer(trackedObject.getCloudPoints(), pose));
         landmarks.add(landMark);
 
 
     }
 
     public List<CloudPoint> updateCoordinates(LandMark landmark, List<CloudPoint> coordinates) {
-        List<CloudPoint> landmarks = new ArrayList<>();
+        List<CloudPoint> newCoordinates = new ArrayList<>();
         for (CloudPoint cloudPoint : coordinates){
             for (CloudPoint points : landmark.getCoordinates()){
                 cloudPoint.setX((cloudPoint.getX()+points.getX())/2);
                 cloudPoint.setY((cloudPoint.getY()+points.getY())/2);
         }
     }
+    return newCoordinates;
+}
 
     public Pose getPoseByTime (int time){
         for (Pose pose : poses){
@@ -77,11 +82,11 @@ public class FusionSlam {
         }
         return null;
     }
-    public void addPose(Pose pose){
+    public void addPose (Pose pose){
         poses.add(pose);
     }
 
-    public static List<CloudPoint> CoordinateTransformer(List<CloudPoint> cloudPoints, Pose pose) {
+    public static List<CloudPoint> coordinateTransformer(List<CloudPoint> cloudPoints, Pose pose) {
         List<CloudPoint> transformedPoints = new ArrayList<>();
 
         // Extract the pose details
@@ -110,5 +115,6 @@ public class FusionSlam {
     }
 }
 
-}
+
+
 
