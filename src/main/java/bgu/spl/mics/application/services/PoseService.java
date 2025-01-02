@@ -1,7 +1,13 @@
 package bgu.spl.mics.application.services;
 
-import bgu.spl.mics.MicroService;
+import java.util.concurrent.ConcurrentHashMap;
+
+import bgu.spl.mics.application.messages.*;
 import bgu.spl.mics.application.objects.GPSIMU;
+import bgu.spl.mics.application.objects.STATUS;
+import bgu.spl.mics.*;
+import bgu.spl.mics.application.objects.Pose;
+
 
 /**
  * PoseService is responsible for maintaining the robot's current pose (position and orientation)
@@ -9,14 +15,18 @@ import bgu.spl.mics.application.objects.GPSIMU;
  */
 public class PoseService extends MicroService {
 
+    private GPSIMU gpsimu;
+    private final ConcurrentHashMap<Event<?>,Future<?>> eventFutures;
+    
     /**
      * Constructor for PoseService.
      *
      * @param gpsimu The GPSIMU object that provides the robot's pose data.
      */
     public PoseService(GPSIMU gpsimu) {
-        super("Change_This_Name");
-        // TODO Implement this
+        super("PoseService");//id?
+        this.gpsimu = gpsimu;
+        this.eventFutures = new ConcurrentHashMap<>();
     }
 
     /**
@@ -25,6 +35,29 @@ public class PoseService extends MicroService {
      */
     @Override
     protected void initialize() {
-        // TODO Implement this
+        this.subscribeBroadcast(TickBroadcast.class, (TickBroadcast tick) -> {
+            int curentTime= tick.getTick();
+            this.gpsimu.updateTick(curentTime);
+            Pose poses = this.gpsimu.getCurrentPose();
+            if(poses != null){
+                PoseEvent e = new PoseEvent(curentTime, poses);
+                eventFutures.put(e,sendEvent(e));
+            }
+            if(this.gpsimu.status==STATUS.DOWN){
+                terminate();
+            }
+            if(this.gpsimu.status==STATUS.ERROR){
+               //crashed brodcast
+            }
+        });
+
+        this.subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast crashed) -> {
+        this.gpsimu.status=STATUS.ERROR;//check errors
+        terminate();
+        });
+        this.subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast terminates) -> {
+           this.gpsimu.status=STATUS.DOWN;
+           terminate();
+        });
     }
 }

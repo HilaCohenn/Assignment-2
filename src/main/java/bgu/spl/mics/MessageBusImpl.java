@@ -87,7 +87,6 @@ public class MessageBusImpl implements MessageBus {
 	public synchronized void unregister(MicroService m) {
         BlockingQueue<Message> queue = microServiceQueues.remove(m);
         subscriptions.values().forEach(queues -> queues.remove(m));
-        //handle round robin counters?
 		if (queue != null) {
         for (Message message : queue) {
             if (message instanceof Event) {

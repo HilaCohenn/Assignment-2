@@ -1,17 +1,13 @@
 package bgu.spl.mics.application.services;
 
-import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.objects.LiDarWorkerTracker;
-
-package bgu.spl.mics.application.services;
-
-import bgu.spl.mics.application.objects.Camera;
 import bgu.spl.mics.application.objects.STATUS;
-import bgu.spl.mics.application.objects.StampedDetectedObjects;
 import bgu.spl.mics.*;
+import bgu.spl.mics.application.objects.TrackedObject;
 import java.util.concurrent.ConcurrentHashMap;
-
+import java.util.List;
 import bgu.spl.mics.application.messages.*;
+
 
 /**
  * LiDarService is responsible for processing data from the LiDAR sensor and
@@ -46,7 +42,7 @@ public class LiDarService extends MicroService {
         this.subscribeBroadcast(TickBroadcast.class, (TickBroadcast tick) -> {
             List<TrackedObject> recentObjects = LiDarWorkerTracker.getTrackedObjectsbyTime(tick.getTick());
             if (recentObjects != null) {
-                TrackedObjectsEvent e = new TrackedObjectsEvent(this.name, recentObjects);
+                TrackedObjectsEvent e = new TrackedObjectsEvent(this.getName(), recentObjects);
                 eventFutures.put(e,sendEvent(e));
             }
         }
