@@ -7,7 +7,28 @@ package bgu.spl.mics.application.objects;
  */
 public class FusionSlam {
     // Singleton instance holder
-    private static class FusionSlamHolder {
-        // TODO: Implement singleton instance logic.
+
+    private static class SingletonHolder {
+            private static FusionSlam instance = new FusionSlam();
+    }
+    private List<LandMark> landmarks;
+    private List<Pose> poses;
+    
+    private FusionSlam(){
+        landmarks = new ArrayList<>();
+        poses = new ArrayList<>();
+    }
+
+    public static FusionSlam getInstance() {
+        return SingletonHolder.instance;
+    }
+
+    public void addLandMark(LandMark landMark){
+        landmarks.add(landMark);
+    }
+
+    public void addPose(Pose pose){
+        poses.add(pose);
     }
 }
+

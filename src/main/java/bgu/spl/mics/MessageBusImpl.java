@@ -10,7 +10,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class MessageBusImpl implements MessageBus {
     private static class SingletonHolder {
-        private static MessageBusImpl instance = new MessageBusImpl();}
+        private static MessageBusImpl instance = new MessageBusImpl();
+    }
     private final ConcurrentMap<MicroService, BlockingQueue<Message>> microServiceQueues;
 	private final ConcurrentMap<Class<? extends Message>, ConcurrentLinkedQueue<MicroService>> subscriptions;
 	private final ConcurrentMap<Event<?>, Future<?>> eventFutures;
