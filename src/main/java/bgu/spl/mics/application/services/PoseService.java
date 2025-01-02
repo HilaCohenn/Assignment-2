@@ -46,13 +46,10 @@ public class PoseService extends MicroService {
             if(this.gpsimu.status==STATUS.DOWN){
                 terminate();
             }
-            if(this.gpsimu.status==STATUS.ERROR){
-               //crashed brodcast
-            }
         });
 
         this.subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast crashed) -> {
-        this.gpsimu.status=STATUS.ERROR;//check errors
+        this.gpsimu.status=STATUS.DOWN;//check errors
         terminate();
         });
         this.subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast terminates) -> {
