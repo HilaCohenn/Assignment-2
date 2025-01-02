@@ -29,7 +29,6 @@ public class LiDarWorkerTracker {
     }
 
     public List<TrackedObject> getTrackedObjectsbyTime(int time){
-
         // find and send the tracked objects at the given time 
         // remove from the list
         List<TrackedObject> currentTime = new ArrayList<>();
@@ -44,7 +43,6 @@ public class LiDarWorkerTracker {
     }
 
     public void addToLastTrackedObjects(StampedDetectedObjects detectedObjects){
-      
         // adds the detected objects to the lastTrackedObjects list
         for (DetectedObject object : detectedObjects.getDetectedObjects()) {
             StampedCloudPoints cloudPoints = this.LiDarDataBase.getCloudPoint(object, detectedObjects.getTime());
