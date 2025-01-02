@@ -33,10 +33,7 @@ public class FusionSlamService extends MicroService {
         // TODO Implement this
 
         this.subscribeEvent(TrackedObjectsEvent.class, (TrackedObjectsEvent trackedObjectsEvent) -> {
-            // TODO Implement this
-            // new object - new landmark
-            // existing object - update landmark coordinates
-            
+            fusionSlam.processLandMark(trackedObjectsEvent.getTrackedObjects());
         });
 
         this.subscribeEvent(PoseEvent.class, (PoseEvent poseEvent) -> {
