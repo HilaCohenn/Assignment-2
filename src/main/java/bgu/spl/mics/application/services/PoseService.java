@@ -36,11 +36,11 @@ public class PoseService extends MicroService {
     @Override
     protected void initialize() {
         this.subscribeBroadcast(TickBroadcast.class, (TickBroadcast tick) -> {
-            int curentTime= tick.getTick();
-            this.gpsimu.updateTick(curentTime);
+            int currentTime= tick.getTick();
+            this.gpsimu.updateTick(currentTime);
             Pose poses = this.gpsimu.getCurrentPose();
             if(poses != null){
-                PoseEvent e = new PoseEvent(curentTime, poses);
+                PoseEvent e = new PoseEvent(currentTime, poses);
                 eventFutures.put(e,sendEvent(e));
             }
             if(this.gpsimu.status==STATUS.DOWN){

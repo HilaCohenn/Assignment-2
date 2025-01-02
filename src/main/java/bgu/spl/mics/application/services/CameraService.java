@@ -1,14 +1,13 @@
 package bgu.spl.mics.application.services;
 
 import bgu.spl.mics.application.objects.Camera;
+import bgu.spl.mics.application.objects.DetectedObject;
 import bgu.spl.mics.application.objects.STATUS;
 import bgu.spl.mics.application.objects.StampedDetectedObjects;
 import bgu.spl.mics.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import bgu.spl.mics.application.messages.*;
-
-
 
 /**
  * CameraService is responsible for processing data from the camera and
@@ -46,6 +45,14 @@ public class CameraService extends MicroService {
             int curentTime= tick.getTick();
             StampedDetectedObjects detectedObjects = camera.getDetectedObjectsbyTime(curentTime);
             if(detectedObjects != null){
+                for(DetectedObject detect: detectedObjects.getDetectedObjects()){
+                    if(detect.getId()=="Error")
+                    {
+                        this.camera.status=STATUS.ERROR;
+                        sendBroadcast(new CrashedBroadcast(this.getName(), detect.getDescription()));
+                        terminate();
+                    }
+                }
                 DetectObjectsEvent e = new DetectObjectsEvent(this.getName(),detectedObjects);
                 eventFutures.put(e,sendEvent(e));
             }

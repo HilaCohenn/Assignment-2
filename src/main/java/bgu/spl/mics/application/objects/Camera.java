@@ -76,6 +76,7 @@ public STATUS getStatus() {
 }
 
 public  StampedDetectedObjects getDetectedObjectsbyTime(int time) {
+    //check for error or end
     StampedDetectedObjects detectedObjects =null;
     for (StampedDetectedObjects detectedObject : this.detectedObjectsList) {
         if (detectedObject.getTime() == time - frequency) { 
