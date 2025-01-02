@@ -19,7 +19,7 @@ public class LandMark {
         // work on turning TrackedObject into a LandMark
     }
 
-    
+
 
     public String getId() {
         return Id;
@@ -31,6 +31,10 @@ public class LandMark {
 
     public List<CloudPoint> getCoordinates() {
         return coordinates;
+    }
+
+    public void setCoordinates(List<CloudPoint> coordinates) {
+        this.coordinates = coordinates;
     }
 
 
