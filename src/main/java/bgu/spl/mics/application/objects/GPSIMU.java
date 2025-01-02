@@ -17,7 +17,7 @@ public class GPSIMU {
       public GPSIMU(String poseFilePath) {
         JsonArray jsonArray = FileReaderUtil.readJsonArray(poseFilePath); 
         if (jsonArray == null) {
-           // System.err.println("Error: Could not load poses from file.");
+           System.err.println("Error: Could not load poses from file.");
             this.status = STATUS.ERROR;
             return;
         }
@@ -29,18 +29,13 @@ public class GPSIMU {
         }
 
         if (poses.isEmpty()) {
-            //System.err.println("Error: Pose list is empty.");
+            System.err.println("Error: Pose list is empty.");
             this.status = STATUS.ERROR;
         }
     }
 
 
     public void updateTick(int tick) {
-        if (tick < 0) {
-           // System.err.println("Error: Tick cannot be negative.");
-            this.status = STATUS.ERROR;
-            return;
-        }
         this.currentTick = tick;
 
         //check if it's the end of the poses = status down
