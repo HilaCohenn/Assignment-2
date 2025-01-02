@@ -76,10 +76,15 @@ public STATUS getStatus() {
 }
 
 public  StampedDetectedObjects getDetectedObjectsbyTime(int time) {
-    //check for error or end
+    int current = time - frequency;
+    int last = this.detectedObjectsList.get(this.detectedObjectsList.size()-1).getTime();
+    if(current>last) {
+        this.status=STATUS.DOWN;    
+        return null;
+    }
     StampedDetectedObjects detectedObjects =null;
     for (StampedDetectedObjects detectedObject : this.detectedObjectsList) {
-        if (detectedObject.getTime() == time - frequency) { 
+        if (detectedObject.getTime() == current) { 
             detectedObjects=detectedObject; 
         }
     }

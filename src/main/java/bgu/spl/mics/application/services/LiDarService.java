@@ -1,5 +1,6 @@
 package bgu.spl.mics.application.services;
 
+import bgu.spl.mics.application.objects.DetectedObject;
 import bgu.spl.mics.application.objects.LiDarWorkerTracker;
 import bgu.spl.mics.application.objects.STATUS;
 import bgu.spl.mics.*;
@@ -42,19 +43,26 @@ public class LiDarService extends MicroService {
         this.subscribeBroadcast(TickBroadcast.class, (TickBroadcast tick) -> {
             List<TrackedObject> recentObjects = LiDarWorkerTracker.getTrackedObjectsbyTime(tick.getTick());
             if (recentObjects != null) {
+                for(TrackedObject detect: recentObjects){
+                    if(detect.getId().equals("ERROR"))
+                    {
+                        this.LiDarWorkerTracker.status=STATUS.ERROR;
+                        sendBroadcast(new CrashedBroadcast(this.getName(), detect.getDescription()));
+                        terminate();
+                    }
+                }
                 TrackedObjectsEvent e = new TrackedObjectsEvent(this.getName(), recentObjects);
                 eventFutures.put(e,sendEvent(e));
             }
         }
         );
-
         this.subscribeEvent(DetectObjectsEvent.class, (DetectObjectsEvent detect) -> {
             LiDarWorkerTracker.addToLastTrackedObjects(detect.getDetectedObjects());
             complete(detect, true);
             
         });
         this.subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast crashed) -> {
-            this.LiDarWorkerTracker.status=STATUS.ERROR;//check errors
+            this.LiDarWorkerTracker.status=STATUS.DOWN;
             terminate();
         });
 

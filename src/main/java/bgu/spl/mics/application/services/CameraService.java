@@ -44,9 +44,16 @@ public class CameraService extends MicroService {
         this.subscribeBroadcast(TickBroadcast.class, (TickBroadcast tick) -> {
             int curentTime= tick.getTick();
             StampedDetectedObjects detectedObjects = camera.getDetectedObjectsbyTime(curentTime);
+            if(camera.status==STATUS.DOWN)
+            {
+                sendBroadcast(new TerminatedBroadcast(this.getName()));
+                terminate();
+            }
+            else
+            {
             if(detectedObjects != null){
                 for(DetectedObject detect: detectedObjects.getDetectedObjects()){
-                    if(detect.getId()=="Error")
+                    if(detect.getId().equals("ERROR"))
                     {
                         this.camera.status=STATUS.ERROR;
                         sendBroadcast(new CrashedBroadcast(this.getName(), detect.getDescription()));
@@ -56,14 +63,15 @@ public class CameraService extends MicroService {
                 DetectObjectsEvent e = new DetectObjectsEvent(this.getName(),detectedObjects);
                 eventFutures.put(e,sendEvent(e));
             }
+        }
         });
         this.subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast crashed) -> {
-        this.camera.status=STATUS.ERROR;//check errors
+        this.camera.status=STATUS.DOWN;
         terminate();
         });
         this.subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast terminates) -> {
            this.camera.status=STATUS.DOWN;
            terminate();
-        });//check who is the sender
+        });
     }
 }
