@@ -31,6 +31,7 @@ public class TimeService extends MicroService {
     protected void initialize() {
         for (int i = 1; i <= Duration; i++) {
             try {
+                
                 Thread.sleep(TickTime);
             } catch (InterruptedException e) {
                 e.printStackTrace();//catch the exception Thread.currentThread().interrup

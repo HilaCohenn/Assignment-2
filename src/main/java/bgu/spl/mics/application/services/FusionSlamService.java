@@ -11,13 +11,15 @@ import bgu.spl.mics.application.objects.FusionSlam;
  * transforming and updating the map with new landmarks.
  */
 public class FusionSlamService extends MicroService {
+
+    private FusionSlam fusionSlam;
     /**
      * Constructor for FusionSlamService.
      *
      * @param fusionSlam The FusionSLAM object responsible for managing the global map.
      */
     public FusionSlamService(FusionSlam fusionSlam) {
-        super("Change_This_Name");
+        super("FusionSlamService");
         // TODO Implement this
     }
 
@@ -29,5 +31,21 @@ public class FusionSlamService extends MicroService {
     @Override
     protected void initialize() {
         // TODO Implement this
+
+        this.subscribeEvent(TrackedObjectsEvent.class, (TrackedObjectsEvent trackedObjectsEvent) -> {
+            // TODO Implement this
+            // new object - new landmark
+            // existing object - update landmark coordinates
+            
+        });
+
+        this.subscribeEvent(PoseEvent.class, (PoseEvent poseEvent) -> {
+            fusionSlam.addPose(poseEvent.getPose());
+        });
+
+        this.subscribeBroadcast(TickBroadcast.class, (TickBroadcast tick) -> {
+            // TODO Implement this
+        });
+
     }
 }
