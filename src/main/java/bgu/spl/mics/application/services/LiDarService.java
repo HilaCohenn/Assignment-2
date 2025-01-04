@@ -72,6 +72,6 @@ public class LiDarService extends MicroService {
             if(terminates.getSender().equals("TimeService")){
             this.LiDarWorkerTracker.status=STATUS.DOWN;
             terminate();
-            }
-         });}
+         });
+    }
 }
