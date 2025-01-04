@@ -6,6 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import bgu.spl.mics.application.objects.CloudPoint;
+import bgu.spl.mics.application.objects.FusionSlam;
+import bgu.spl.mics.application.objects.LandMark;
+import bgu.spl.mics.application.objects.Pose;
+import bgu.spl.mics.application.objects.TrackedObject;
 
 class MessageBusImplTest {
 
