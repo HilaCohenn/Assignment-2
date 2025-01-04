@@ -13,6 +13,7 @@ public class LiDarWorkerTracker {
     public STATUS status;
     private List<TrackedObject> lastTrackedObjects;
     private LiDarDataBase LiDarDataBase;
+    private boolean addedAll = false;
 
 
     public LiDarWorkerTracker(int id, int frequency, LiDarDataBase LiDarDataBase) {
@@ -20,7 +21,7 @@ public class LiDarWorkerTracker {
         this.frequency = frequency;
         this.status = STATUS.UP;
         this.LiDarDataBase = LiDarDataBase;
-
+        this.lastTrackedObjects = new ArrayList<>();
         
     }
 
@@ -31,6 +32,9 @@ public class LiDarWorkerTracker {
     public List<TrackedObject> getTrackedObjectsbyTime(int time){
         // find and send the tracked objects at the given time 
         // remove from the list
+        if(addedAll&&lastTrackedObjects.isEmpty()){
+            this.status = STATUS.DOWN;
+        }
         List<TrackedObject> currentTime = new ArrayList<>();
         List<TrackedObject> copyTrackedObjects = new ArrayList<>(this.lastTrackedObjects);
         for (TrackedObject trackedObject : copyTrackedObjects) {
@@ -48,7 +52,13 @@ public class LiDarWorkerTracker {
             StampedCloudPoints cloudPoints = this.LiDarDataBase.getCloudPoint(object, detectedObjects.getTime());
             TrackedObject trackedObject = new TrackedObject(object.getId(), detectedObjects.getTime(), object.getDescription(), cloudPoints.getCloudPoints());
             lastTrackedObjects.add(trackedObject);
+            StampedCloudPoints lastCloudPoint = this.LiDarDataBase.getlast();
+            if(trackedObject.getTime() == lastCloudPoint.getTime()&&trackedObject.getId().equals(lastCloudPoint.getId())){
+                addedAll = true;
+            }
         }
     }
+
+ 
     
 }

@@ -69,8 +69,9 @@ public class CameraService extends MicroService {
         terminate();
         });
         this.subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast terminates) -> {
+           if(terminates.getSender().equals("TimeService")){ 
            this.camera.status=STATUS.DOWN;
-           terminate();
+           terminate();}
         });
     }
 }

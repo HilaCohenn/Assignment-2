@@ -2,7 +2,7 @@ package bgu.spl.mics.application.services;
 
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.objects.FusionSlam;
-
+import bgu.spl.mics.application.objects.STATUS;
 import bgu.spl.mics.application.messages.*;
 
 /**
@@ -22,7 +22,7 @@ public class FusionSlamService extends MicroService {
      */
     public FusionSlamService(FusionSlam fusionSlam) {
         super("FusionSlamService");
-        // TODO Implement this
+        this.fusionSlam = fusionSlam;
     }
 
     /**
@@ -43,6 +43,10 @@ public class FusionSlamService extends MicroService {
             fusionSlam.addPose(poseEvent.getPose());
             complete(poseEvent, true);
             
+        });
+        
+        this.subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast crashed) -> {
+            terminate();
         });
 
         this.subscribeBroadcast(TickBroadcast.class, (TickBroadcast tick) -> {

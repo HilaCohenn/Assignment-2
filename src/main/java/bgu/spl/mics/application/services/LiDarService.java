@@ -41,12 +41,15 @@ public class LiDarService extends MicroService {
     protected void initialize() {
         this.subscribeBroadcast(TickBroadcast.class, (TickBroadcast tick) -> {
             List<TrackedObject> recentObjects = LiDarWorkerTracker.getTrackedObjectsbyTime(tick.getTick());
+            if(this.LiDarWorkerTracker.status==STATUS.DOWN){
+                terminate();
+            }
             if (recentObjects != null) {
                 for(TrackedObject detect: recentObjects){
                     if(detect.getId().equals("ERROR"))
                     {
                         this.LiDarWorkerTracker.status=STATUS.ERROR;
-                        sendBroadcast(new CrashedBroadcast(this.getName(), detect.getDescription()));
+                        sendBroadcast(new CrashedBroadcast(this.getName(), this.getName()+" disconnected"));
                         terminate();
                     }
                 }
@@ -66,6 +69,7 @@ public class LiDarService extends MicroService {
         });
 
         this.subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast terminates) -> {
+            if(terminates.getSender().equals("TimeService")){
             this.LiDarWorkerTracker.status=STATUS.DOWN;
             terminate();
          });

@@ -53,8 +53,10 @@ public class PoseService extends MicroService {
         terminate();
         });
         this.subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast terminates) -> {
+        if(terminates.getSender().equals("TimeService")){
            this.gpsimu.status=STATUS.DOWN;
            terminate();
+        }
         });
     }
 }
