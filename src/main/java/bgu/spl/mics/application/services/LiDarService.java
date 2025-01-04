@@ -68,6 +68,6 @@ public class LiDarService extends MicroService {
         this.subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast terminates) -> {
             this.LiDarWorkerTracker.status=STATUS.DOWN;
             terminate();
-         });//check who is the sender
+         });
     }
 }
