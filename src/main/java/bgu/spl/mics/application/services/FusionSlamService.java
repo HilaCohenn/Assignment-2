@@ -3,6 +3,8 @@ package bgu.spl.mics.application.services;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.objects.FusionSlam;
 
+import bgu.spl.mics.application.messages.*;
+
 /**
  * FusionSlamService integrates data from multiple sensors to build and update
  * the robot's global map.
@@ -34,10 +36,13 @@ public class FusionSlamService extends MicroService {
 
         this.subscribeEvent(TrackedObjectsEvent.class, (TrackedObjectsEvent trackedObjectsEvent) -> {
             fusionSlam.processLandMark(trackedObjectsEvent.getTrackedObjects());
+            complete(trackedObjectsEvent, true);
         });
 
         this.subscribeEvent(PoseEvent.class, (PoseEvent poseEvent) -> {
             fusionSlam.addPose(poseEvent.getPose());
+            complete(poseEvent, true);
+            
         });
 
         this.subscribeBroadcast(TickBroadcast.class, (TickBroadcast tick) -> {
