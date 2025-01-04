@@ -1,5 +1,7 @@
 package bgu.spl.mics.application.services;
 
+import bgu.spl.mics.application.messages.CrashedBroadcast;
+import bgu.spl.mics.application.messages.TerminatedBroadcast;
 import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.MicroService;
 /**
@@ -10,6 +12,7 @@ public class TimeService extends MicroService {
 
     int TickTime;
     int Duration;
+    boolean isTerminated=false;
 
     /**
      * Constructor for TimeService.
@@ -29,15 +32,37 @@ public class TimeService extends MicroService {
      */
     @Override
     protected void initialize() {
-        for (int i = 1; i <= Duration; i++) {
-            try {
-                
-                Thread.sleep(TickTime);
-            } catch (InterruptedException e) {
-                e.printStackTrace();//catch the exception Thread.currentThread().interrup
+        this.subscribeBroadcast(TickBroadcast.class, (TickBroadcast tick) -> {
+            try{
+            int currentTime= tick.getTick();
+            Thread.sleep(TickTime);// the tests is in seconds, we need to multiply by 1000 to adjust
+            sendBroadcast(new TickBroadcast(currentTime+1)); //check if we got terminate while sleeping
+            if(currentTime+1==Duration){
+                terminate();
             }
-            sendBroadcast(new TickBroadcast(i)); 
-        }
+            }
+            catch (InterruptedException e) {
+           // e.printStackTrace();
+            }
+        });
+        this.subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast crashed) -> {
         terminate();
+        });
+
+        this.subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast terminates) -> {
+           if(terminates.getSender().equals("TimeService")||terminates.getSender().equals("FusionSlamService"))
+               terminate();
+        });
+        try{
+        Thread.sleep(TickTime);
+        //check that everybody is ready
+        sendBroadcast(new TickBroadcast(1));
+        }
+        catch (InterruptedException e) {
+            //e.printStackTrace();
+       }
     }
 }
+
+
+ 

@@ -46,7 +46,6 @@ public class CameraService extends MicroService {
             StampedDetectedObjects detectedObjects = camera.getDetectedObjectsbyTime(curentTime);
             if(camera.status==STATUS.DOWN)
             {
-                sendBroadcast(new TerminatedBroadcast(this.getName()));
                 terminate();
             }
             else
@@ -70,8 +69,9 @@ public class CameraService extends MicroService {
         terminate();
         });
         this.subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast terminates) -> {
+           if(terminates.getSender().equals("TimeService")){ 
            this.camera.status=STATUS.DOWN;
-           terminate();
+           terminate();}
         });
     }
 }

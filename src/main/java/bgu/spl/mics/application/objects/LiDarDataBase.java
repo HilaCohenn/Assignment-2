@@ -56,6 +56,9 @@ public class LiDarDataBase {
         }
     return null;
 }
-
+    public StampedCloudPoints getlast()
+    {
+        return this.cloudPoints.get(this.cloudPoints.size()-1);
+    }
 }
 
