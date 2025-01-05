@@ -19,7 +19,7 @@ class CameraServiceTest {
 
         // make sure the path is correct
 
-        cameraService = new CameraService(camera);
+        cameraService = new CameraService(camera, null);
         messageBus = MessageBusImpl.getInstance();
         messageBus.register(cameraService);
     }

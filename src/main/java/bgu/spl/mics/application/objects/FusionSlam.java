@@ -16,15 +16,25 @@ public class FusionSlam {
     }
     private List<LandMark> landmarks;
     private List<Pose> poses;
+    private StatisticalFolder statistics;
     
     private FusionSlam(){
-        landmarks = new ArrayList<>();
-        poses = new ArrayList<>();
+        this.landmarks = new ArrayList<>();
+        this.poses = new ArrayList<>();
+        this.statistics = null;
     }
 
-    public static FusionSlam getInstance() {
-        return SingletonHolder.instance;
+    public static FusionSlam getInstance(StatisticalFolder statistics) {
+        FusionSlam inst= SingletonHolder.instance;
+        inst.setStatistics(statistics);
+        return inst;
     }
+
+    private void setStatistics(StatisticalFolder statistics){
+        if(this.statistics == null){
+            this.statistics = statistics;
+        }
+    }   
 
     public void processLandMark(List<TrackedObject> trackedObjects){
         for(TrackedObject trackedObject : trackedObjects){
@@ -59,8 +69,7 @@ public class FusionSlam {
         Pose pose = getPoseByTime(trackedObject.getTime());
         LandMark landMark = new LandMark(trackedObject.getId(), trackedObject.getDescription(), coordinateTransformer(trackedObject.getCloudPoints(), pose));
         landmarks.add(landMark);
-
-
+        this.statistics.addToLandMark(1);
     }
 
     public List<CloudPoint> updateCoordinates(LandMark landmark, List<CloudPoint> coordinates) {
