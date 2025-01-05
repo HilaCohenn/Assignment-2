@@ -29,6 +29,7 @@ public class Camera {
 
 private final int id;
 private final int frequency;
+private String camara_key;
 public STATUS status;
 private final List<StampedDetectedObjects> detectedObjectsList;
 
@@ -37,9 +38,10 @@ private final List<StampedDetectedObjects> detectedObjectsList;
  *
  * @param frequency The time interval at which the camera sends new events.
  */ 
-public Camera(int id, int frequency,String path) {
+public Camera(int id, int frequency,String key,String path) {
     this.id = id;
     this.frequency = frequency;
+    this.camara_key=key;
     this.status = STATUS.UP;
     this.detectedObjectsList = new ArrayList<>();
     initDetectedObjects(path);
@@ -48,10 +50,9 @@ public Camera(int id, int frequency,String path) {
 private void initDetectedObjects (String path){
     Gson gson = new Gson();
     JsonObject o = FileReaderUtil.readJson(path);
-    String name = "camera" + this.id;
     // Check if the camera exists in the JSON object
-    if (o.has(name)) {
-        JsonArray cameraData = o.getAsJsonArray(name);
+    if (o.has(camara_key)) {
+        JsonArray cameraData = o.getAsJsonArray(camara_key);
         // Iterate over the array of camera data
         for (int i = 0; i < cameraData.size(); i++) {
             JsonObject cameraEntry = cameraData.get(i).getAsJsonObject();
