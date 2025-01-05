@@ -60,6 +60,7 @@ public class FusionSlamTest {
             assertNotNull(landmark.getId(), "Landmark ID should not be null");
             assertNotNull(landmark.getDescription(), "Landmark description should not be null");
             assertNotNull(landmark.getCoordinates(), "Landmark coordinates should not be null");
+            assertFalse(landmark.getCoordinates().isEmpty(), "Landmark coordinates should not be empty");
         }
     }
 
@@ -87,6 +88,7 @@ public class FusionSlamTest {
             assertNotNull(landmark.getId(), "Landmark ID should not be null");
             assertNotNull(landmark.getDescription(), "Landmark description should not be null");
             assertNotNull(landmark.getCoordinates(), "Landmark coordinates should not be null");
+            assertFalse(landmark.getCoordinates().isEmpty(), "Landmark coordinates should not be empty");
         }
     }
 }

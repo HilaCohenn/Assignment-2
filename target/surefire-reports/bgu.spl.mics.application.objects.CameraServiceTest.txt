@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 Test set: bgu.spl.mics.application.objects.CameraServiceTest
 -------------------------------------------------------------------------------
-Tests run: 2, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 0.057 s <<< FAILURE! - in bgu.spl.mics.application.objects.CameraServiceTest
-testHandleTickBroadcast  Time elapsed: 0.051 s  <<< ERROR!
+Tests run: 2, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 0.103 s <<< FAILURE! - in bgu.spl.mics.application.objects.CameraServiceTest
+testHandleTickBroadcast  Time elapsed: 0.083 s  <<< ERROR!
 java.lang.NullPointerException: Cannot invoke "com.google.gson.JsonObject.has(String)" because "o" is null
 	at bgu.spl.mics.application.objects.CameraServiceTest.setUp(CameraServiceTest.java:21)
 
