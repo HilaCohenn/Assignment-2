@@ -24,7 +24,7 @@ public class TimeService extends MicroService {
      */
     public TimeService(int TickTime, int Duration, StatisticalFolder statistics) {
         super("TimeService");
-        this.TickTime = TickTime;
+        this.TickTime = TickTime *1000 ;
         this.Duration = Duration;
         this.statistics = statistics;
     }
@@ -38,7 +38,7 @@ public class TimeService extends MicroService {
         this.subscribeBroadcast(TickBroadcast.class, (TickBroadcast tick) -> {
             try{
             int currentTime= tick.getTick();
-            Thread.sleep(TickTime);// the tests is in seconds, we need to multiply by 1000 to adjust
+            Thread.sleep(TickTime);
             sendBroadcast(new TickBroadcast(currentTime+1)); //check if we got terminate while sleeping
             statistics.setsystemRuntime(currentTime+1);
             if(currentTime+1==Duration){
