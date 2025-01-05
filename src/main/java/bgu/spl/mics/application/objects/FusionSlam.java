@@ -16,6 +16,7 @@ public class FusionSlam {
     }
     private List<LandMark> landmarks;
     private List<Pose> poses;
+    private List<trackedObject> toBeProcessed;
     private StatisticalFolder statistics;
     
     private FusionSlam(){
@@ -60,13 +61,22 @@ public class FusionSlam {
         for (LandMark landMark : landmarks){
             if (landMark.getId().equals(trackedObject.getId())){
                 updateCoordinates(landMark, trackedObject.getCloudPoints());
-                landMark.setCoordinates(coordinateTransformer(trackedObject.getCloudPoints(), getPoseByTime(trackedObject.getTime())));
+                Pose pose = getPoseByTime(trackedObject.getTime());
+                if (pose == null){
+                    toBeProcessed.add(trackedObject);
+                    return;
+                }
+                landMark.setCoordinates(coordinateTransformer(trackedObject.getCloudPoints(), pose));
             }
         }
     }
 
     public void addLandMark(TrackedObject trackedObject){
         Pose pose = getPoseByTime(trackedObject.getTime());
+        if (pose == null){
+            toBeProcessed.add(trackedObject);
+            return;
+        }
         LandMark landMark = new LandMark(trackedObject.getId(), trackedObject.getDescription(), coordinateTransformer(trackedObject.getCloudPoints(), pose));
         landmarks.add(landMark);
         this.statistics.addToLandMark(1);
@@ -91,7 +101,14 @@ public class FusionSlam {
         }
         return null;
     }
-    public void addPose (Pose pose){
+
+    public void processPose (Pose pose){
+        for (TrackedObject trackedObject : toBeProcessed){
+            if (trackedObject.getTime() == pose.getTime()){
+                processLandMark(trackedObject);
+                toBeProcessed.remove(trackedObject);
+            }
+        }
         poses.add(pose);
     }
 
