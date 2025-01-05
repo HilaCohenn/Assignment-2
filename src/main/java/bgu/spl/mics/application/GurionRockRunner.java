@@ -1,5 +1,7 @@
 package bgu.spl.mics.application;
 
+
+
 /**
  * The main entry point for the GurionRock Pro Max Ultra Over 9000 simulation.
  * <p>
