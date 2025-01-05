@@ -105,7 +105,7 @@ public class FusionSlam {
     public void processPose (Pose pose){
         for (TrackedObject trackedObject : toBeProcessed){
             if (trackedObject.getTime() == pose.getTime()){
-                addLandMark(trackedObject);
+                processLandMark(trackedObject);
                 toBeProcessed.remove(trackedObject);
             }
         }
