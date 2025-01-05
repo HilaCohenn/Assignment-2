@@ -4,6 +4,7 @@ import bgu.spl.mics.application.objects.Camera;
 import bgu.spl.mics.application.objects.DetectedObject;
 import bgu.spl.mics.application.objects.STATUS;
 import bgu.spl.mics.application.objects.StampedDetectedObjects;
+import bgu.spl.mics.application.objects.StatisticalFolder;
 import bgu.spl.mics.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -20,17 +21,18 @@ public class CameraService extends MicroService {
 
     private final Camera camera;
     private final ConcurrentHashMap<Event<?>,Future<?>> eventFutures;
-    
+    private StatisticalFolder statistics;
 
     /**
      * Constructor for CameraService.
      *
      * @param camera The Camera object that this service will use to detect objects.
      */
-    public CameraService(Camera camera) {
+    public CameraService(Camera camera,StatisticalFolder statistics) {
         super("CameraService" + camera.getId());
         this.camera = camera;
         this.eventFutures = new ConcurrentHashMap<>();
+        this.statistics = statistics;
     
     }
 
@@ -60,6 +62,7 @@ public class CameraService extends MicroService {
                     }
                 }
                 DetectObjectsEvent e = new DetectObjectsEvent(this.getName(),detectedObjects);
+                statistics.addToDetectedObjcts(detectedObjects.getDetectedObjects().size());
                 eventFutures.put(e,sendEvent(e));
             }
         }

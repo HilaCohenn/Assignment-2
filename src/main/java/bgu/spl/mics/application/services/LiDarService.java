@@ -2,6 +2,7 @@ package bgu.spl.mics.application.services;
 
 import bgu.spl.mics.application.objects.LiDarWorkerTracker;
 import bgu.spl.mics.application.objects.STATUS;
+import bgu.spl.mics.application.objects.StatisticalFolder;
 import bgu.spl.mics.*;
 import bgu.spl.mics.application.objects.TrackedObject;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,15 +22,17 @@ public class LiDarService extends MicroService {
 
     private final LiDarWorkerTracker LiDarWorkerTracker;
     private final ConcurrentHashMap<Event<?>,Future<?>> eventFutures;
+    private StatisticalFolder statistics;
     /**
      * Constructor for LiDarService.
      *
      * @param LiDarWorkerTracker A LiDAR Tracker worker object that this service will use to process data.
      */
-    public LiDarService(LiDarWorkerTracker LiDarWorkerTracker) {
+    public LiDarService(LiDarWorkerTracker LiDarWorkerTracker,StatisticalFolder statistics) {
         super("LiDarService" + LiDarWorkerTracker.getId());
         this.LiDarWorkerTracker = LiDarWorkerTracker;
         this.eventFutures = new ConcurrentHashMap<>();
+        this.statistics = statistics;
     }
 
     /**
@@ -54,6 +57,7 @@ public class LiDarService extends MicroService {
                     }
                 }
                 TrackedObjectsEvent e = new TrackedObjectsEvent(this.getName(), recentObjects);
+                statistics.addToTrackedObjects(recentObjects.size());
                 eventFutures.put(e,sendEvent(e));
             }
         }
@@ -72,6 +76,6 @@ public class LiDarService extends MicroService {
             if(terminates.getSender().equals("TimeService")){
             this.LiDarWorkerTracker.status=STATUS.DOWN;
             terminate();
-         });
+         }});
     }
 }

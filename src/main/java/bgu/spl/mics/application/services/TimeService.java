@@ -3,6 +3,7 @@ package bgu.spl.mics.application.services;
 import bgu.spl.mics.application.messages.CrashedBroadcast;
 import bgu.spl.mics.application.messages.TerminatedBroadcast;
 import bgu.spl.mics.application.messages.TickBroadcast;
+import bgu.spl.mics.application.objects.StatisticalFolder;
 import bgu.spl.mics.MicroService;
 /**
  * TimeService acts as the global timer for the system, broadcasting TickBroadcast messages
@@ -13,6 +14,7 @@ public class TimeService extends MicroService {
     int TickTime;
     int Duration;
     boolean isTerminated=false;
+    StatisticalFolder statistics;
 
     /**
      * Constructor for TimeService.
@@ -20,10 +22,11 @@ public class TimeService extends MicroService {
      * @param TickTime  The duration of each tick in milliseconds.
      * @param Duration  The total number of ticks before the service terminates.
      */
-    public TimeService(int TickTime, int Duration) {
+    public TimeService(int TickTime, int Duration, StatisticalFolder statistics) {
         super("TimeService");
         this.TickTime = TickTime;
         this.Duration = Duration;
+        this.statistics = statistics;
     }
 
     /**
@@ -37,6 +40,7 @@ public class TimeService extends MicroService {
             int currentTime= tick.getTick();
             Thread.sleep(TickTime);// the tests is in seconds, we need to multiply by 1000 to adjust
             sendBroadcast(new TickBroadcast(currentTime+1)); //check if we got terminate while sleeping
+            statistics.setsystemRuntime(currentTime+1);
             if(currentTime+1==Duration){
                 terminate();
             }
@@ -57,7 +61,7 @@ public class TimeService extends MicroService {
         Thread.sleep(TickTime);
         //check that everybody is ready
         sendBroadcast(new TickBroadcast(1));
-        }
+        statistics.setsystemRuntime(1);        }
         catch (InterruptedException e) {
             //e.printStackTrace();
        }
