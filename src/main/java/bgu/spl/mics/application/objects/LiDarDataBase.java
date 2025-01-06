@@ -5,9 +5,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
-import bgu.spl.mics.*;
 
-
+import java.io.FileReader;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +41,8 @@ public class LiDarDataBase {
     }
     private void initCloudPoints(String filePath){
         Gson gson = new Gson();
-        JsonObject lidars = FileReaderUtil.readJson(filePath);
+        try {
+        FileReader lidars = new FileReader(filePath);
         Type listType = new TypeToken<List<StampedCloudPoints>>(){}.getType();
         List<JsonObject> jsonObjects = gson.fromJson(lidars, listType);
         for (JsonObject jsonObject : jsonObjects) {
@@ -58,6 +58,8 @@ public class LiDarDataBase {
                 }
                 this.cloudPoints.add(new StampedCloudPoints(time,id,points));
             }
+        } catch (Exception e) {
+        }
     }
 
     //get the cloud points of a specific object
