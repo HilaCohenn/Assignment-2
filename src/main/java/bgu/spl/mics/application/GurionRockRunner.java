@@ -44,8 +44,8 @@ public class GurionRockRunner {
         //init camara
         List<Camera> cameras = new ArrayList<>();
         JsonObject robotObject = FileReaderUtil.readJson(configFilePath);
-        JsonArray camerasArray = robotObject.getAsJsonArray("CamerasConfigurations");
-        String cameraDataPath = Paths.get(folderPath, robotObject.get("camera_datas_path").getAsString()).normalize().toString();
+        JsonArray camerasArray = robotObject.getAsJsonObject("Cameras").getAsJsonArray("CamerasConfigurations");
+        String cameraDataPath = Paths.get(folderPath, robotObject.getAsJsonObject("Cameras").get("camera_datas_path").getAsString()).normalize().toString();
          for (int i = 0; i < camerasArray.size(); i++) {
             JsonObject cameraConfig = camerasArray.get(i).getAsJsonObject();
             int id = cameraConfig.get("id").getAsInt();
@@ -59,8 +59,8 @@ public class GurionRockRunner {
 
         //init lidars
         List<LiDarWorkerTracker> lidars = new ArrayList<>();
-        JsonArray LidarsArray = robotObject.getAsJsonArray("LidarConfigurations");
-        String lidarDataString =Paths.get(folderPath, robotObject.get("lidars_data_path").getAsString()).normalize().toString();
+        JsonArray LidarsArray = robotObject.getAsJsonObject("LidarWorkers").getAsJsonArray("LidarConfigurations");
+        String lidarDataString =Paths.get(folderPath, robotObject.getAsJsonObject("LidarWorkers").get("lidars_data_path").getAsString()).normalize().toString();
         LiDarDataBase lidarDataBase = LiDarDataBase.getInstance(lidarDataString);
         for (int i = 0; i < LidarsArray.size(); i++) {
             JsonObject lidarConfig = LidarsArray.get(i).getAsJsonObject();
