@@ -70,16 +70,19 @@ public class GurionRockRunner {
                 cameras.add(camera);
             }
 
-            // Initialize lidars
-            List<LiDarWorkerTracker> lidars = new ArrayList<>();
-            JsonArray lidarsArray = robotObject.getAsJsonArray("LidarConfigurations");
-            String lidarDataString = Paths.get(folderPath, robotObject.get("lidars_data_path").getAsString()).normalize().toString();
-            LiDarDataBase lidarDataBase = LiDarDataBase.getInstance(lidarDataString);
+            // Initialize LiDARs
+            List<LiDARWorkerTracker> lidars = new ArrayList<>();
+            JsonObject lidarsObject = robotObject.getAsJsonObject("Lidars");
+            if (lidarsObject == null) {
+                throw new IllegalArgumentException("Missing 'Lidars' configuration");
+            }
+            JsonArray lidarsArray = lidarsObject.getAsJsonArray("LidarConfigurations");
+            String lidarDataPath = Paths.get(folderPath, lidarsObject.get("lidar_datas_path").getAsString()).normalize().toString();
             for (int i = 0; i < lidarsArray.size(); i++) {
                 JsonObject lidarConfig = lidarsArray.get(i).getAsJsonObject();
                 int id = lidarConfig.get("id").getAsInt();
                 int frequency = lidarConfig.get("frequency").getAsInt();
-                LiDarWorkerTracker lidar = new LiDarWorkerTracker(id, frequency, lidarDataBase);
+                LiDARWorkerTracker lidar = new LiDARWorkerTracker(id, frequency, lidarDataPath);
                 lidars.add(lidar);
             }
 
@@ -93,7 +96,7 @@ public class GurionRockRunner {
             }
 
             List<LiDarService> lidarServices = new ArrayList<>();
-            for (LiDarWorkerTracker lidar : lidars) {
+            for (LiDARWorkerTracker lidar : lidars) {
                 LiDarService lidarService = new LiDarService(lidar, statistics);
                 lidarServices.add(lidarService);
             }
