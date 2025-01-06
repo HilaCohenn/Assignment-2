@@ -1,124 +1,133 @@
 package bgu.spl.mics.application;
 
-import bgu.spl.mics.application.objects.*;
-import bgu.spl.mics.application.services.*;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
 import java.io.File;
-import java.io.FileReader;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
+import bgu.spl.mics.application.objects.*;
+import bgu.spl.mics.application.services.*;
+
+import bgu.spl.mics.*;
+
+/**
+ * The main entry point for the GurionRock Pro Max Ultra Over 9000 simulation.
+ * <p>
+ * This class initializes the system and starts the simulation by setting up
+ * services, objects, and configurations.
+ * </p>
+ */
 public class GurionRockRunner {
 
+    /**
+     * The main method of the simulation.
+     * This method sets up the necessary components, parses configuration files,
+     * initializes services, and starts the simulation.
+     *
+     * @param args Command-line arguments. The first argument is expected to be the path to the configuration file.
+     */
     public static void main(String[] args) {
-        if (args.length != 1) {
-            System.err.println("Usage: java GurionRockRunner <config-file-path>");
-            System.exit(1);
-        }
+        // TODO: Parse configuration file.
+        // TODO: Initialize system components and services.
+        // TODO: Start the simulation.
+        System.out.println("GurionRock Pro Max Ultra Over 9000 is starting...");
 
         String configFilePath = args[0];
-        File configFile = new File(configFilePath);
-        if (!configFile.exists()) {
-            System.err.println("Configuration file not found: " + configFilePath);
-            System.exit(1);
-        }
+        String folderPath = new File(configFilePath).getParent();
+        StatisticalFolder statistics = new StatisticalFolder();
+        FusionSlam fusionSlam = FusionSlam.getInstance(statistics);
 
-        try (FileReader reader = new FileReader(configFile)) {
-            JsonObject config = JsonParser.parseReader(reader).getAsJsonObject();
-            String folderPath = configFile.getParent();
+        //init camara
+        List<Camera> cameras = new ArrayList<>();
+        JsonObject robotObject = FileReaderUtil.readJson(configFilePath);
+        JsonArray camerasArray = robotObject.getAsJsonArray("CamerasConfigurations");
+        String cameraDataPath = Paths.get(folderPath, robotObject.get("camera_datas_path").getAsString()).normalize().toString();
+         for (int i = 0; i < camerasArray.size(); i++) {
+            JsonObject cameraConfig = camerasArray.get(i).getAsJsonObject();
+            int id = cameraConfig.get("id").getAsInt();
+            int frequency = cameraConfig.get("frequency").getAsInt();
+            String key = cameraConfig.get("camera_key").getAsString();
 
-            // Debugging: Print the configuration file content
-            System.out.println("Configuration: " + config.toString());
+            //create camera
+            Camera camera = new Camera(id, frequency,key, cameraDataPath);
+            cameras.add(camera);
+         }
 
-            // Initialize components
-            JsonObject robotObject = config.getAsJsonObject("robot");
-            if (robotObject == null) {
-                throw new IllegalArgumentException("Missing 'robot' configuration");
-            }
+        //init lidars
+        List<LiDarWorkerTracker> lidars = new ArrayList<>();
+        JsonArray LidarsArray = robotObject.getAsJsonArray("LidarConfigurations");
+        String lidarDataString =Paths.get(folderPath, robotObject.get("lidars_data_path").getAsString()).normalize().toString();
+        LiDarDataBase lidarDataBase = LiDarDataBase.getInstance(lidarDataString);
+        for (int i = 0; i < LidarsArray.size(); i++) {
+            JsonObject lidarConfig = LidarsArray.get(i).getAsJsonObject();
+            int id = lidarConfig.get("id").getAsInt();
+            int frequency = lidarConfig.get("frequency").getAsInt();
 
-            String poseJsonFile = robotObject.has("poseJsonFile") ? 
-                Paths.get(folderPath, robotObject.get("poseJsonFile").getAsString()).normalize().toString() : null;
-            if (poseJsonFile == null) {
-                throw new IllegalArgumentException("Missing 'poseJsonFile' in 'robot' configuration");
-            }
+            //create lidarWorker
+            LiDarWorkerTracker lidar = new LiDarWorkerTracker(id, frequency,lidarDataBase);
+            lidars.add(lidar);
+         }
+
+         //init gpsimu
+         String poseJsonFile = Paths.get(folderPath, robotObject.get("poseJsonFile").getAsString()).normalize().toString();
             GPSIMU gpsimu = new GPSIMU(poseJsonFile);
 
-            int duration = robotObject.has("Duration") ? robotObject.get("Duration").getAsInt() : 0;
-            int tickTime = robotObject.has("TickTime") ? robotObject.get("TickTime").getAsInt() : 0;
-            if (duration == 0 || tickTime == 0) {
-                throw new IllegalArgumentException("Missing 'Duration' or 'TickTime' in 'robot' configuration");
-            }
-
-            // Initialize cameras
-            List<Camera> cameras = new ArrayList<>();
-            JsonObject camerasObject = robotObject.getAsJsonObject("Cameras");
-            if (camerasObject == null) {
-                throw new IllegalArgumentException("Missing 'Cameras' configuration");
-            }
-            JsonArray camerasArray = camerasObject.getAsJsonArray("CamerasConfigurations");
-            String cameraDataPath = Paths.get(folderPath, camerasObject.get("camera_datas_path").getAsString()).normalize().toString();
-            for (int i = 0; i < camerasArray.size(); i++) {
-                JsonObject cameraConfig = camerasArray.get(i).getAsJsonObject();
-                int id = cameraConfig.get("id").getAsInt();
-                int frequency = cameraConfig.get("frequency").getAsInt();
-                String cameraKey = cameraConfig.get("camera_key").getAsString();
-                Camera camera = new Camera(id, frequency, cameraKey, cameraDataPath);
-                cameras.add(camera);
-            }
-
-            // Initialize LiDARs
-            List<LiDARWorkerTracker> lidars = new ArrayList<>();
-            JsonObject lidarsObject = robotObject.getAsJsonObject("Lidars");
-            if (lidarsObject == null) {
-                throw new IllegalArgumentException("Missing 'Lidars' configuration");
-            }
-            JsonArray lidarsArray = lidarsObject.getAsJsonArray("LidarConfigurations");
-            String lidarDataPath = Paths.get(folderPath, lidarsObject.get("lidar_datas_path").getAsString()).normalize().toString();
-            for (int i = 0; i < lidarsArray.size(); i++) {
-                JsonObject lidarConfig = lidarsArray.get(i).getAsJsonObject();
-                int id = lidarConfig.get("id").getAsInt();
-                int frequency = lidarConfig.get("frequency").getAsInt();
-                LiDARWorkerTracker lidar = new LiDARWorkerTracker(id, frequency, lidarDataPath);
-                lidars.add(lidar);
-            }
-
-            StatisticalFolder statistics = new StatisticalFolder();
-            FusionSlam fusionSlam = FusionSlam.getInstance(statistics);
-
-            List<MicroService> camServices = new ArrayList<>();
-            for (Camera camera : cameras) {
-                CameraService cameraService = new CameraService(camera, statistics);
-                camServices.add(cameraService);
-            }
-
-            List<LiDarService> lidarServices = new ArrayList<>();
-            for (LiDARWorkerTracker lidar : lidars) {
-                LiDarService lidarService = new LiDarService(lidar, statistics);
-                lidarServices.add(lidarService);
-            }
-
-            // Start services
-            for (MicroService service : camServices) {
-                new Thread(service).start();
-            }
-            for (MicroService service : lidarServices) {
-                new Thread(service).start();
-            }
-
-            // Run simulation
-            // This is a placeholder for the actual simulation logic
-            Thread.sleep(duration * tickTime);
-
-            // Generate output file
-            OutputHandler.generateOutputFile(configFilePath, fusionSlam, statistics);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
+        int duration = robotObject.get("Duration").getAsInt();
+        int tickTime = robotObject.get("TickTime").getAsInt();
+        
+        //init services
+        List<MicroService> camServices = new ArrayList<>();
+        for (Camera camera : cameras) {
+            CameraService cameraService = new CameraService(camera, statistics);
+            camServices.add(cameraService);
         }
+
+        List<LiDarService> lidarServices = new ArrayList<>();
+        for (LiDarWorkerTracker lidar : lidars) {
+            LiDarService lidarService = new LiDarService(lidar, statistics);
+            lidarServices.add(lidarService);
+        }
+
+        PoseService poseService = new PoseService(gpsimu);
+        TimeService timeService = new TimeService(tickTime, duration, statistics);
+
+
+        List<Thread> threads = new ArrayList<>();
+        for (MicroService service : camServices) {
+            Thread thread = new Thread(service);
+            threads.add(thread);
+        }
+        for (MicroService service : lidarServices) {
+            Thread thread = new Thread(service);
+            threads.add(thread);
+        }
+        threads.add(new Thread(poseService));
+        threads.add(new Thread(timeService));
+        AtomicInteger numServices = new AtomicInteger(threads.size()-1);
+        FusionSlamService fusionSlamService = new FusionSlamService(fusionSlam, numServices);
+        threads.add(new Thread(fusionSlamService));
+        // wait till all services are initialized
+
+ 
+        //start all threads after all services are initialized
+        for (Thread thread : threads) {
+            thread.start();
+        }
+
+        // Wait for all threads to finish
+        for (Thread thread : threads) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Generate output file
+        OutputHandler.generateOutputFile(configFilePath, fusionSlam, statistics);
     }
 }
