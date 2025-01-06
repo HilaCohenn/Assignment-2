@@ -1,5 +1,6 @@
 package bgu.spl.mics.application.objects;
 import java.util.List;
+import java.util.ArrayList;
 
 import bgu.spl.mics.FileReaderUtil;
 import com.google.gson.Gson;
@@ -21,7 +22,7 @@ public class GPSIMU {
             this.status = STATUS.ERROR;
             return;
         }
-
+        this.poses = new ArrayList<>();
         Gson gson = new Gson();
         for (JsonElement element : jsonArray) {
             Pose pose = gson.fromJson(element, Pose.class); 
