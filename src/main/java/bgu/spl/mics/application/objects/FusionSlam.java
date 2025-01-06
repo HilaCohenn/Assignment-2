@@ -103,12 +103,14 @@ public class FusionSlam {
     }
 
     public void processPose (Pose pose){
+        private List<TrackedObject> newLandMarks = new ArrayList<>();
         for (TrackedObject trackedObject : toBeProcessed){
             if (trackedObject.getTime() == pose.getTime()){
-                processLandMark(trackedObject);
+                newLandMarks.add(trackedObject);
                 toBeProcessed.remove(trackedObject);
             }
         }
+        processLandMark(newLandMarks);
         poses.add(pose);
     }
 
