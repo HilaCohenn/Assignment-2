@@ -34,7 +34,7 @@ public class GurionRockRunner {
         // TODO: Parse configuration file.
         // TODO: Initialize system components and services.
         // TODO: Start the simulation.
-        System.out.println("GurionRock Pro Max Ultra Over 9000 is starting...");
+        System.out.println("GurionRock Pro Max Ultra Over 9000 is starting....");
 
         String configFilePath = args[0];
         String folderPath = new File(configFilePath).getParent();
@@ -44,9 +44,8 @@ public class GurionRockRunner {
         //init camara
         List<Camera> cameras = new ArrayList<>();
         JsonObject robotObject = FileReaderUtil.readJson(configFilePath);
-
-        JsonArray camerasArray = robotObject.getAsJsonArray("CamerasConfigurations");
-        String cameraDataPath = Paths.get(folderPath, robotObject.get("camera_datas_path").getAsString()).normalize().toString();
+        JsonArray camerasArray = robotObject.getAsJsonObject("Cameras").getAsJsonArray("CamerasConfigurations");
+        String cameraDataPath = Paths.get(folderPath, robotObject.getAsJsonObject("Cameras").get("camera_datas_path").getAsString()).normalize().toString();
          for (int i = 0; i < camerasArray.size(); i++) {
             JsonObject cameraConfig = camerasArray.get(i).getAsJsonObject();
             int id = cameraConfig.get("id").getAsInt();
@@ -58,15 +57,10 @@ public class GurionRockRunner {
             cameras.add(camera);
          }
 
-         //
-         System.out.println("Cameras initialized");
-         //
-
-
         //init lidars
         List<LiDarWorkerTracker> lidars = new ArrayList<>();
-        JsonArray LidarsArray = robotObject.getAsJsonArray("LidarConfigurations");
-        String lidarDataString =Paths.get(folderPath, robotObject.get("lidars_data_path").getAsString()).normalize().toString();
+        JsonArray LidarsArray = robotObject.getAsJsonObject("LidarWorkers").getAsJsonArray("LidarConfigurations");
+        String lidarDataString =Paths.get(folderPath, robotObject.getAsJsonObject("LidarWorkers").get("lidars_data_path").getAsString()).normalize().toString();
         LiDarDataBase lidarDataBase = LiDarDataBase.getInstance(lidarDataString);
         for (int i = 0; i < LidarsArray.size(); i++) {
             JsonObject lidarConfig = LidarsArray.get(i).getAsJsonObject();
@@ -77,10 +71,6 @@ public class GurionRockRunner {
             LiDarWorkerTracker lidar = new LiDarWorkerTracker(id, frequency,lidarDataBase);
             lidars.add(lidar);
          }
-
-         //
-         System.out.println("Lidars initialized");
-         //
 
          //init gpsimu
          String poseJsonFile = Paths.get(folderPath, robotObject.get("poseJsonFile").getAsString()).normalize().toString();
