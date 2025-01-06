@@ -60,8 +60,13 @@ public class GurionRockRunner {
         //init lidars
         List<LiDarWorkerTracker> lidars = new ArrayList<>();
         JsonArray LidarsArray = robotObject.getAsJsonObject("LidarWorkers").getAsJsonArray("LidarConfigurations");
+System.out.println("1 ");
+
         String lidarDataString =Paths.get(folderPath, robotObject.getAsJsonObject("LidarWorkers").get("lidars_data_path").getAsString()).normalize().toString();
+        System.out.println("2 ");
+
         LiDarDataBase lidarDataBase = LiDarDataBase.getInstance(lidarDataString);
+        System.out.println("3 ");
         for (int i = 0; i < LidarsArray.size(); i++) {
             JsonObject lidarConfig = LidarsArray.get(i).getAsJsonObject();
             int id = lidarConfig.get("id").getAsInt();

@@ -39,11 +39,14 @@ public class LiDarDataBase {
         initCloudPoints(path);
     }
     private void initCloudPoints(String filePath){
-        JsonArray jsonArray = FileReaderUtil.readJson(filePath).getAsJsonArray();
 
+        JsonArray jsonArray = FileReaderUtil.readJsonArray(filePath);
         // Get the objects and parse them into cloudPoints list
         Gson gson = new Gson();
         Type objectListType = new TypeToken<List<StampedCloudPoints>>() {}.getType();
+                // 
+                System.out.println("here");
+                //
         this.cloudPoints = gson.fromJson(jsonArray, objectListType);
     }
 
