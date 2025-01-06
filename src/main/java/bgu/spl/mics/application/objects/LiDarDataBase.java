@@ -1,6 +1,8 @@
 package bgu.spl.mics.application.objects;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 import bgu.spl.mics.*;
@@ -39,15 +41,23 @@ public class LiDarDataBase {
         initCloudPoints(path);
     }
     private void initCloudPoints(String filePath){
-
-        JsonArray jsonArray = FileReaderUtil.readJsonArray(filePath);
-        // Get the objects and parse them into cloudPoints list
         Gson gson = new Gson();
-        Type objectListType = new TypeToken<List<StampedCloudPoints>>() {}.getType();
-                // 
-                System.out.println("here");
-                //
-        this.cloudPoints = gson.fromJson(jsonArray, objectListType);
+        JsonObject lidars = FileReaderUtil.readJson(filePath);
+        Type listType = new TypeToken<List<StampedCloudPoints>>(){}.getType();
+        List<JsonObject> jsonObjects = gson.fromJson(lidars, listType);
+        for (JsonObject jsonObject : jsonObjects) {
+            int time = jsonObject.get("time").getAsInt();
+            String id = jsonObject.get("id").getAsString();
+            JsonArray cloudPointsdata = jsonObject.getAsJsonArray("cloudPoints");
+            List<CloudPoint> points = new ArrayList<>();
+                for (JsonElement p : cloudPointsdata) {
+                JsonArray pointArray = p.getAsJsonArray();
+                    double x = pointArray.get(0).getAsDouble();
+                    double y = pointArray.get(1).getAsDouble();
+                    points.add(new CloudPoint(x, y));
+                }
+                this.cloudPoints.add(new StampedCloudPoints(time,id,points));
+            }
     }
 
     //get the cloud points of a specific object
