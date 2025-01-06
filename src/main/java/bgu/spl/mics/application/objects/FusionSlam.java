@@ -16,7 +16,7 @@ public class FusionSlam {
     }
     private List<LandMark> landmarks;
     private List<Pose> poses;
-    private List<trackedObject> toBeProcessed;
+    private List<TrackedObject> toBeProcessed;
     private StatisticalFolder statistics;
     
     private FusionSlam(){
