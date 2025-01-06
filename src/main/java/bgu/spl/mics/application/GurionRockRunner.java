@@ -108,5 +108,8 @@ public class GurionRockRunner {
         threads.add(new Thread(fusionSlamService));
         threads.add(new Thread(timeService));
         //start all threads after all services are initialized
+
+        // Generate output file
+        OutputHandler.generateOutputFile(configFilePath, fusionSlam, statistics);
     }
 }
