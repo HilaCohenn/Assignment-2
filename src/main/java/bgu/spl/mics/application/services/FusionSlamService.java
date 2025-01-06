@@ -48,6 +48,12 @@ public class FusionSlamService extends MicroService {
             terminate();
         });
 
+        this.subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast terminate) -> {
+            if (terminated == numServices){
+                terminate();
+            }
+        });
+
         this.subscribeBroadcast(TickBroadcast.class, (TickBroadcast tick) -> {
             // TODO Implement this
         });
