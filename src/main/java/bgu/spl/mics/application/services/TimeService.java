@@ -39,7 +39,7 @@ public class TimeService extends MicroService {
             try{
             int currentTime= tick.getTick();
             Thread.sleep(TickTime);
-            sendBroadcast(new TickBroadcast(currentTime+1)); //check if we got terminate while sleeping
+            sendBroadcast(new TickBroadcast(currentTime+1)); 
             statistics.setsystemRuntime(currentTime+1);
             if(currentTime+1==Duration){
                 terminate();

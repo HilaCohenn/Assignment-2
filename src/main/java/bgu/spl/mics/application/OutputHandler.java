@@ -9,7 +9,7 @@ import com.google.gson.JsonObject;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.List;
+import java.io.File;
 
 public class OutputHandler {
 

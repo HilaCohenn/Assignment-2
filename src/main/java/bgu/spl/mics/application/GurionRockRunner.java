@@ -4,7 +4,7 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -94,7 +94,7 @@ public class GurionRockRunner {
 
         PoseService poseService = new PoseService(gpsimu);
         TimeService timeService = new TimeService(tickTime, duration, statistics);
-        FusionSlamService fusionSlamService = new FusionSlamService(fusionSlam);
+
 
         List<Thread> threads = new ArrayList<>();
         for (MicroService service : camServices) {
@@ -106,9 +106,10 @@ public class GurionRockRunner {
             threads.add(thread);
         }
         threads.add(new Thread(poseService));
-        threads.add(new Thread(fusionSlamService));
         threads.add(new Thread(timeService));
-        
+        AtomicInteger numServices = new AtomicInteger(threads.size()-1);
+        FusionSlamService fusionSlamService = new FusionSlamService(fusionSlam, numServices);
+        threads.add(new Thread(fusionSlamService));
         // wait till all services are initialized
 
  

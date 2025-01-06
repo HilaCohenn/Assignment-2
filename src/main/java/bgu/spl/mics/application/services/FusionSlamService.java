@@ -1,10 +1,12 @@
 package bgu.spl.mics.application.services;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.objects.FusionSlam;
 import bgu.spl.mics.application.messages.*;
-import bgu.spl.mics.application.passiveObjects.Landmark;
-import bgu.spl.mics.application.TerminateBroadcast;
+
+
 
 
 /**
@@ -17,14 +19,17 @@ import bgu.spl.mics.application.TerminateBroadcast;
 public class FusionSlamService extends MicroService {
 
     private FusionSlam fusionSlam;
+    private AtomicInteger numServices;
+    private AtomicInteger numServicesTerminated = new AtomicInteger(0);
     /**
      * Constructor for FusionSlamService.
      *
      * @param fusionSlam The FusionSLAM object responsible for managing the global map.
      */
-    public FusionSlamService(FusionSlam fusionSlam) {
+    public FusionSlamService(FusionSlam fusionSlam, AtomicInteger numServices) {
         super("FusionSlamService");
         this.fusionSlam = fusionSlam;
+        this.numServices = numServices;
     }
 
     /**
@@ -51,8 +56,12 @@ public class FusionSlamService extends MicroService {
             terminate();
         });
 
-        this.subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast terminate) -> {
-            if (terminated == numServices){
+        this.subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast terminate) -> {
+            if(!terminate.getSender().equals("TimeService"))
+            {
+                numServicesTerminated.incrementAndGet();
+            }
+            if (numServicesTerminated == numServices){
                 terminate();
             }
         });
