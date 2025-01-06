@@ -3,6 +3,9 @@ package bgu.spl.mics.application.services;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.objects.FusionSlam;
 import bgu.spl.mics.application.messages.*;
+import bgu.spl.mics.application.passiveObjects.Landmark;
+import bgu.spl.mics.application.TerminateBroadcast;
+
 
 /**
  * FusionSlamService integrates data from multiple sensors to build and update

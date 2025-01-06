@@ -1,0 +1,14 @@
+bgu\spl\mics\application\objects\StampedCloudPoints.class
+bgu\spl\mics\Callback.class
+bgu\spl\mics\Message.class
+bgu\spl\mics\application\messages\DetectObjectsEvent.class
+bgu\spl\mics\FileReaderUtil.class
+bgu\spl\mics\application\objects\StampedDetectedObjects.class
+bgu\spl\mics\application\objects\StatisticalFolder.class
+bgu\spl\mics\Event.class
+bgu\spl\mics\Future.class
+bgu\spl\mics\Broadcast.class
+bgu\spl\mics\application\objects\DetectedObject.class
+bgu\spl\mics\MessageBus.class
+bgu\spl\mics\application\objects\CloudPoint.class
+bgu\spl\mics\MicroService.class

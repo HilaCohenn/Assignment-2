@@ -34,6 +34,7 @@ public class GurionRockRunner {
         // TODO: Parse configuration file.
         // TODO: Initialize system components and services.
         // TODO: Start the simulation.
+        System.out.println("GurionRock Pro Max Ultra Over 9000 is starting...");
 
         String configFilePath = args[0];
         String folderPath = new File(configFilePath).getParent();
@@ -107,7 +108,23 @@ public class GurionRockRunner {
         threads.add(new Thread(poseService));
         threads.add(new Thread(fusionSlamService));
         threads.add(new Thread(timeService));
+        
+        // wait till all services are initialized
+
+ 
         //start all threads after all services are initialized
+        for (Thread thread : threads) {
+            thread.start();
+        }
+
+        // Wait for all threads to finish
+        for (Thread thread : threads) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 
         // Generate output file
         OutputHandler.generateOutputFile(configFilePath, fusionSlam, statistics);
