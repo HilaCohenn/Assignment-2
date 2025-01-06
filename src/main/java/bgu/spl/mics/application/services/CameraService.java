@@ -7,6 +7,7 @@ import bgu.spl.mics.application.objects.StampedDetectedObjects;
 import bgu.spl.mics.application.objects.StatisticalFolder;
 import bgu.spl.mics.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 
 import bgu.spl.mics.application.messages.*;
 
@@ -22,17 +23,19 @@ public class CameraService extends MicroService {
     private final Camera camera;
     private final ConcurrentHashMap<Event<?>,Future<?>> eventFutures;
     private StatisticalFolder statistics;
+    private CountDownLatch latch;
 
     /**
      * Constructor for CameraService.
      *
      * @param camera The Camera object that this service will use to detect objects.
      */
-    public CameraService(Camera camera,StatisticalFolder statistics) {
+    public CameraService(Camera camera,StatisticalFolder statistics,CountDownLatch latch) {
         super("CameraService" + camera.getId());
         this.camera = camera;
         this.eventFutures = new ConcurrentHashMap<>();
         this.statistics = statistics;
+        this.latch=latch;
     
     }
 
@@ -76,5 +79,6 @@ public class CameraService extends MicroService {
            this.camera.status=STATUS.DOWN;
            terminate();}
         });
+        latch.countDown();
     }
 }

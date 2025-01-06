@@ -4,6 +4,7 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.gson.JsonArray;
@@ -82,22 +83,24 @@ public class GurionRockRunner {
 
         int duration = robotObject.get("Duration").getAsInt();
         int tickTime = robotObject.get("TickTime").getAsInt();
+
+        CountDownLatch latch = new CountDownLatch(cameras.size() + lidars.size() + 1);
         
         //init services
         List<MicroService> camServices = new ArrayList<>();
         for (Camera camera : cameras) {
-            CameraService cameraService = new CameraService(camera, statistics);
+            CameraService cameraService = new CameraService(camera, statistics,latch);
             camServices.add(cameraService);
         }
 
         List<LiDarService> lidarServices = new ArrayList<>();
         for (LiDarWorkerTracker lidar : lidars) {
-            LiDarService lidarService = new LiDarService(lidar, statistics);
+            LiDarService lidarService = new LiDarService(lidar, statistics,latch);
             lidarServices.add(lidarService);
         }
 
-        PoseService poseService = new PoseService(gpsimu);
-        TimeService timeService = new TimeService(tickTime, duration, statistics);
+        PoseService poseService = new PoseService(gpsimu,latch);
+        TimeService timeService = new TimeService(tickTime, duration, statistics,latch);
 
 
         List<Thread> threads = new ArrayList<>();
@@ -112,13 +115,14 @@ public class GurionRockRunner {
         threads.add(new Thread(poseService));
         threads.add(new Thread(timeService));
         AtomicInteger numServices = new AtomicInteger(threads.size()-1);
-        FusionSlamService fusionSlamService = new FusionSlamService(fusionSlam, numServices);
+        FusionSlamService fusionSlamService = new FusionSlamService(fusionSlam, numServices,latch);
         threads.add(new Thread(fusionSlamService));
         // wait till all services are initialized
-
+         
  
         //start all threads after all services are initialized
         for (Thread thread : threads) {
+                thread.start();
             thread.start();
         }
 

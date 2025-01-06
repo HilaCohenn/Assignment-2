@@ -1,6 +1,7 @@
 package bgu.spl.mics.application.services;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 
 import bgu.spl.mics.application.messages.*;
 import bgu.spl.mics.application.objects.GPSIMU;
@@ -17,16 +18,18 @@ public class PoseService extends MicroService {
 
     private GPSIMU gpsimu;
     private final ConcurrentHashMap<Event<?>,Future<?>> eventFutures;
+    private CountDownLatch latch;
     
     /**
      * Constructor for PoseService.
      *
      * @param gpsimu The GPSIMU object that provides the robot's pose data.
      */
-    public PoseService(GPSIMU gpsimu) {
+    public PoseService(GPSIMU gpsimu, CountDownLatch latch) {
         super("PoseService");
         this.gpsimu = gpsimu;
         this.eventFutures = new ConcurrentHashMap<>();
+        this.latch = latch;
     }
 
     /**
@@ -58,5 +61,6 @@ public class PoseService extends MicroService {
            terminate();
         }
         });
+        latch.countDown();
     }
 }
