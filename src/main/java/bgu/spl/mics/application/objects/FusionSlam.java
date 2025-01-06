@@ -23,6 +23,7 @@ public class FusionSlam {
         this.landmarks = new ArrayList<>();
         this.poses = new ArrayList<>();
         this.statistics = null;
+        this.toBeProcessed = new ArrayList<>();
     }
 
     public static FusionSlam getInstance(StatisticalFolder statistics) {

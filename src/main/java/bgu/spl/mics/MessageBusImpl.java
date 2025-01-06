@@ -54,6 +54,7 @@ public class MessageBusImpl implements MessageBus {
 	    ConcurrentLinkedQueue<MicroService> microServices = subscriptions.get(b.getClass());
         if (microServices != null) {
             for (MicroService m : microServices) {
+                System.out.println("Sending broadcast " + b.getClass().getSimpleName() + " to " + m.getName());
                 microServiceQueues.get(m).add(b);
             }
         }
