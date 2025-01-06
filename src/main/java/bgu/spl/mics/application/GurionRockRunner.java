@@ -34,7 +34,7 @@ public class GurionRockRunner {
         // TODO: Parse configuration file.
         // TODO: Initialize system components and services.
         // TODO: Start the simulation.
-        System.out.println("GurionRock Pro Max Ultra Over 9000 is starting....");
+        System.out.println("GurionRock Pro Max Ultra Over 9000 is starting...");
 
         String configFilePath = args[0];
         String folderPath = new File(configFilePath).getParent();
