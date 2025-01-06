@@ -50,6 +50,10 @@ public class LiDarWorkerTracker {
         // adds the detected objects to the lastTrackedObjects list
         for (DetectedObject object : detectedObjects.getDetectedObjects()) {
             StampedCloudPoints cloudPoints = this.LiDarDataBase.getCloudPoint(object, detectedObjects.getTime());
+            if (cloudPoints == null) {
+                System.out.println("cloudPoints ");;
+            }
+            
             TrackedObject trackedObject = new TrackedObject(object.getId(), detectedObjects.getTime(), object.getDescription(), cloudPoints.getCloudPoints());
             lastTrackedObjects.add(trackedObject);
             StampedCloudPoints lastCloudPoint = this.LiDarDataBase.getlast();

@@ -70,6 +70,7 @@ public class MessageBusImpl implements MessageBus {
      int index = roundRobinCounters.get(e.getClass()).getAndIncrement() % microServices.size();
      MicroService m = microServices.stream().skip(index).findFirst().orElse(null);
      if (m != null) {
+        System.out.println("Sending event " + e.getClass().getSimpleName() + " to " + m.getName());
         microServiceQueues.get(m).add(e);
         Future<T> future = new Future<>();
         eventFutures.put(e, future);
