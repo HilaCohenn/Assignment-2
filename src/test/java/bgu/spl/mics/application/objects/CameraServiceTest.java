@@ -5,6 +5,7 @@ import bgu.spl.mics.application.messages.*;
 import bgu.spl.mics.application.services.CameraService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import java.util.concurrent.CountDownLatch;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CameraServiceTest {
