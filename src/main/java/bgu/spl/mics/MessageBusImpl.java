@@ -56,7 +56,6 @@ public class MessageBusImpl implements MessageBus {
              for (MicroService m : microServices) {
                  BlockingQueue<Message> queue = microServiceQueues.get(m);
                  if (queue != null) {
-                     System.out.println("Sending broadcast " + b.getClass().getSimpleName() + " to " + m.getName());
                      queue.add(b);
                  }
              }
@@ -73,7 +72,6 @@ public class MessageBusImpl implements MessageBus {
      int index = roundRobinCounters.get(e.getClass()).getAndIncrement() % microServices.size();
      MicroService m = microServices.stream().skip(index).findFirst().orElse(null);
      if (m != null) {
-        System.out.println("Sending event " + e.getClass().getSimpleName() + " to " + m.getName());
         microServiceQueues.get(m).add(e);
         Future<T> future = new Future<>();
         eventFutures.put(e, future);

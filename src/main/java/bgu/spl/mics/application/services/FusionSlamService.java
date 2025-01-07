@@ -69,10 +69,7 @@ public class FusionSlamService extends MicroService {
             {
                 numServicesTerminated.incrementAndGet();
             }
-
-            System.out.println(numServicesTerminated + " services terminated out of " + numServices);
             if (numServicesTerminated.get() == numServices.get()){
-                System.out.println("FusionSlamService terminated");
                 terminate();
             }
         });

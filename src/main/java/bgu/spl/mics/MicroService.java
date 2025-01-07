@@ -112,7 +112,7 @@ public abstract class MicroService implements Runnable {
      */
     protected final void sendBroadcast(Broadcast b) {
         if (!terminated||b instanceof TerminatedBroadcast) {
-            System.out.println("MicroService: " + this.name + " sent broadcast: " + b.getClass().getName());
+            
             messageBus.sendBroadcast(b);
         }
     }
@@ -143,7 +143,7 @@ public abstract class MicroService implements Runnable {
     protected final void terminate() {
         terminated = true;
         sendBroadcast(new TerminatedBroadcast(this.name));   
-        System.out.println("MicroService: " + this.name + " terminated");
+        
         // Thread.currentThread().interrupt();
     }
 
@@ -175,7 +175,7 @@ public abstract class MicroService implements Runnable {
                 //check this
             }
         }
-        System.out.println("MicroService: " + this.name + " terminated123");
+        
         messageBus.unregister(this);
     }
 

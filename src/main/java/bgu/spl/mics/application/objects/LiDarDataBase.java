@@ -64,12 +64,9 @@ public class LiDarDataBase {
 
     //get the cloud points of a specific object
     public StampedCloudPoints getCloudPoint(DetectedObject d,int time) {
-        System.out.println("getCloudPoint" + d.getId() + " " + time);
-        System.out.println("cloudPoints size" + this.cloudPoints.size());
             for (StampedCloudPoints cloudPoint : this.cloudPoints) {
-                System.out.println(cloudPoint.getId() + " " + cloudPoint.getTime());
-            if (cloudPoint.getId().equals(d.getId())&&cloudPoint.getTime()==time) {
-               return cloudPoint;
+                if (cloudPoint.getId().equals(d.getId())&&cloudPoint.getTime()==time) {
+                return cloudPoint;
             }
         }
     return null;
