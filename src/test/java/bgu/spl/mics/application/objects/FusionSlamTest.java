@@ -36,8 +36,8 @@ public class FusionSlamTest {
         TrackedObject trackedObject2 = new TrackedObject("2", 2, "Object 2", cloudPoints);
 
         // Add poses
-        fusionSlam.addPose(new Pose(0.0f, 0.0f, 0.0f, 1));
-        fusionSlam.addPose(new Pose(1.0f, 1.0f, 45.0f, 2));
+        fusionSlam.processPose(new Pose(0.0f, 0.0f, 0.0f, 1));
+        fusionSlam.processPose(new Pose(1.0f, 1.0f, 45.0f, 2));
 
         // Process landmarks
         List<TrackedObject> trackedObjects = new ArrayList<>();
