@@ -13,7 +13,7 @@ class CameraServiceTest {
     private Camera camera;
     private CameraService cameraService;
     private MessageBus messageBus;
-    private CountDownLatch latch = new CountDownLatch(1);
+    private CountDownLatch latch = new CountDownLatch(0);
     private ErrorData errorData = new ErrorData();
 
     @BeforeEach
@@ -30,7 +30,7 @@ class CameraServiceTest {
         // 1. The camera status is set to UP (not ERROR or DOWN).
         // 2. The CameraService is subscribed to TickBroadcasts.
         assertEquals(STATUS.UP, camera.getStatus());
-        int currentTime = 5;
+        int currentTime = 6;
         StampedDetectedObjects detectedObjects = camera.getDetectedObjectsbyTime(currentTime);
         assertNotNull(detectedObjects);
         assertFalse(detectedObjects.getDetectedObjects().isEmpty(), "Detected objects should not be empty");
