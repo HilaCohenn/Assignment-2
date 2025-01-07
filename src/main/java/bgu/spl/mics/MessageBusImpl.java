@@ -61,6 +61,7 @@ public class MessageBusImpl implements MessageBus {
                  }
              }
          }
+    }
 
 	
 	@Override
