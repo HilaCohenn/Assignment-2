@@ -60,7 +60,7 @@ class CameraTest {
                 new DetectedObject("Circular_Base_1", "Circular Base")
         )));
 
-        camera = new Camera(1, 2, "camera1", detectedObjectsList);
+        camera = new Camera(1, 2, detectedObjectsList);
         cameraService = new CameraService(camera, new StatisticalFolder(), latch, errorData);
         messageBus = MessageBusImpl.getInstance();
         messageBus.register(cameraService);
