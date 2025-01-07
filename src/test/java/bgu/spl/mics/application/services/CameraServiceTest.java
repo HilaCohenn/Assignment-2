@@ -1,8 +1,8 @@
-package bgu.spl.mics.application.objects;
+package bgu.spl.mics.application.services;
 
 import bgu.spl.mics.*;
 import bgu.spl.mics.application.messages.*;
-import bgu.spl.mics.application.services.CameraService;
+import bgu.spl.mics.application.objects.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.concurrent.CountDownLatch;

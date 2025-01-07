@@ -1,4 +1,4 @@
- package bgu.spl.mics.application.objects;
+ package bgu.spl.mics;
 
  import org.junit.jupiter.api.BeforeEach;
  import org.junit.jupiter.api.Test;

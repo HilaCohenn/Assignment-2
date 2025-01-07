@@ -49,4 +49,5 @@ bgu\spl\mics\application\services\LiDarService.class
 bgu\spl\mics\MessageBusImpl$SingletonHolder.class
 bgu\spl\mics\Broadcast.class
 bgu\spl\mics\application\objects\LandMark.class
+bgu\spl\mics\application\objects\ErrorData.class
 bgu\spl\mics\example\services\ExampleEventHandlerService.class
