@@ -51,4 +51,29 @@ class CameraServiceTest {
             assertEquals(expected.getDescription(), actual.getDescription(), "The detected object descriptions should match");
         }
     }
-}
+        @Test
+    void testGetDetectedObjectsByDifferentTime() {
+        int objectTime = 4;
+        int cameraFrequency = 2;
+        int queryTime = objectTime + cameraFrequency;
+
+        StampedDetectedObjects expectedObjects = new StampedDetectedObjects(objectTime, List.of(
+                new DetectedObject("Wall_3", "Wall"),
+                new DetectedObject("Wall_4", "Wall")
+        ));
+
+        StampedDetectedObjects actualObjects = camera.getDetectedObjectsbyTime(queryTime);
+
+        assertNotNull(actualObjects, "The detected objects should not be null");
+        assertEquals(expectedObjects.getTime(), actualObjects.getTime(), "The times should match");
+        assertEquals(expectedObjects.getDetectedObjects().size(), actualObjects.getDetectedObjects().size(), "The number of detected objects should match");
+
+        for (int i = 0; i < expectedObjects.getDetectedObjects().size(); i++) {
+            DetectedObject expected = expectedObjects.getDetectedObjects().get(i);
+            DetectedObject actual = actualObjects.getDetectedObjects().get(i);
+            assertEquals(expected.getId(), actual.getId(), "The detected object IDs should match");
+            assertEquals(expected.getDescription(), actual.getDescription(), "The detected object descriptions should match");
+        }
+    }
+ }
+
