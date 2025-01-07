@@ -40,6 +40,7 @@ public class GurionRockRunner {
         String folderPath = new File(configFilePath).getParent();
         StatisticalFolder statistics = new StatisticalFolder();
         FusionSlam fusionSlam = FusionSlam.getInstance(statistics);
+        ErrorData errorData = new ErrorData();
 
         //init camara
         List<Camera> cameras = new ArrayList<>();
@@ -89,13 +90,13 @@ public class GurionRockRunner {
         //init services
         List<MicroService> camServices = new ArrayList<>();
         for (Camera camera : cameras) {
-            CameraService cameraService = new CameraService(camera, statistics,latch);
+            CameraService cameraService = new CameraService(camera, statistics,latch,errorData);
             camServices.add(cameraService);
         }
 
         List<LiDarService> lidarServices = new ArrayList<>();
         for (LiDarWorkerTracker lidar : lidars) {
-            LiDarService lidarService = new LiDarService(lidar, statistics,latch);
+            LiDarService lidarService = new LiDarService(lidar, statistics,latch,errorData);
             lidarServices.add(lidarService);
         }
 
@@ -115,7 +116,7 @@ public class GurionRockRunner {
         threads.add(new Thread(poseService));
         threads.add(new Thread(timeService));
         AtomicInteger numServices = new AtomicInteger(threads.size()-1);
-        FusionSlamService fusionSlamService = new FusionSlamService(fusionSlam, numServices,latch);
+        FusionSlamService fusionSlamService = new FusionSlamService(fusionSlam, numServices,latch,errorData);
         threads.add(new Thread(fusionSlamService));
         // wait till all services are initialized
          

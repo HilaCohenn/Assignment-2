@@ -2,12 +2,15 @@ package bgu.spl.mics.application.services;
 
 import bgu.spl.mics.application.objects.Camera;
 import bgu.spl.mics.application.objects.DetectedObject;
+import bgu.spl.mics.application.objects.ErrorData;
 import bgu.spl.mics.application.objects.STATUS;
 import bgu.spl.mics.application.objects.StampedDetectedObjects;
 import bgu.spl.mics.application.objects.StatisticalFolder;
 import bgu.spl.mics.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.ArrayList;
+import java.util.List;
 
 import bgu.spl.mics.application.messages.*;
 
@@ -24,18 +27,22 @@ public class CameraService extends MicroService {
     private final ConcurrentHashMap<Event<?>,Future<?>> eventFutures;
     private StatisticalFolder statistics;
     private CountDownLatch latch;
+    private StampedDetectedObjects lastDetectedObjects;
+    private ErrorData errorData;
 
     /**
      * Constructor for CameraService.
      *
      * @param camera The Camera object that this service will use to detect objects.
      */
-    public CameraService(Camera camera,StatisticalFolder statistics,CountDownLatch latch) {
+    public CameraService(Camera camera,StatisticalFolder statistics,CountDownLatch latch,ErrorData errorData) {
         super("CameraService" + camera.getId());
         this.camera = camera;
         this.eventFutures = new ConcurrentHashMap<>();
         this.statistics = statistics;
         this.latch=latch;
+        this.lastDetectedObjects=null;
+        this.errorData = errorData;
     
     }
 
@@ -62,11 +69,13 @@ public class CameraService extends MicroService {
                         this.camera.status=STATUS.ERROR;
                         sendBroadcast(new CrashedBroadcast(this.getName(), detect.getDescription()));
                         terminate();
+                        this.errorData.addCamaraFrame(this.getName(),this.lastDetectedObjects);
                     }
                 }
                 DetectObjectsEvent e = new DetectObjectsEvent(this.getName(),detectedObjects);
                 statistics.addToDetectedObjcts(detectedObjects.getDetectedObjects().size());
                 eventFutures.put(e,sendEvent(e));
+                this.lastDetectedObjects=detectedObjects;
             }
         }
         });

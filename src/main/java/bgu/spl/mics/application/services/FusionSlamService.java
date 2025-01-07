@@ -4,6 +4,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import bgu.spl.mics.MicroService;
+import bgu.spl.mics.application.objects.ErrorData;
 import bgu.spl.mics.application.objects.FusionSlam;
 import bgu.spl.mics.application.messages.*;
 
@@ -23,16 +24,18 @@ public class FusionSlamService extends MicroService {
     private AtomicInteger numServices;
     private AtomicInteger numServicesTerminated = new AtomicInteger(0);
     private CountDownLatch latch;
+    private ErrorData errorData;
     /**
      * Constructor for FusionSlamService.
      *
      * @param fusionSlam The FusionSLAM object responsible for managing the global map.
      */
-    public FusionSlamService(FusionSlam fusionSlam, AtomicInteger numServices, CountDownLatch latch) {
+    public FusionSlamService(FusionSlam fusionSlam, AtomicInteger numServices, CountDownLatch latch, ErrorData errorData) {
         super("FusionSlamService");
         this.fusionSlam = fusionSlam;
         this.numServices = numServices;
         this.latch = latch;
+        this.errorData = errorData;
     }
 
     /**
@@ -57,6 +60,8 @@ public class FusionSlamService extends MicroService {
 
         this.subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast crashed) -> {
             terminate();
+            this.errorData.setError(crashed.getDescription());
+            this.errorData.setFaultySensor(crashed.getSender());
         });
 
         this.subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast terminate) -> {

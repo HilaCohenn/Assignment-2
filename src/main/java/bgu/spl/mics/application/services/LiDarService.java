@@ -1,5 +1,6 @@
 package bgu.spl.mics.application.services;
 
+import bgu.spl.mics.application.objects.ErrorData;
 import bgu.spl.mics.application.objects.LiDarWorkerTracker;
 import bgu.spl.mics.application.objects.STATUS;
 import bgu.spl.mics.application.objects.StatisticalFolder;
@@ -7,6 +8,7 @@ import bgu.spl.mics.*;
 import bgu.spl.mics.application.objects.TrackedObject;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.ArrayList;
 import java.util.List;
 import bgu.spl.mics.application.messages.*;
 
@@ -25,17 +27,21 @@ public class LiDarService extends MicroService {
     private final ConcurrentHashMap<Event<?>,Future<?>> eventFutures;
     private StatisticalFolder statistics;
     private CountDownLatch latch;
+    private List<TrackedObject> lastTrackedObject;
+    private ErrorData errorData;
     /**
      * Constructor for LiDarService.
      *
      * @param LiDarWorkerTracker A LiDAR Tracker worker object that this service will use to process data.
      */
-    public LiDarService(LiDarWorkerTracker LiDarWorkerTracker,StatisticalFolder statistics, CountDownLatch latch) {
+    public LiDarService(LiDarWorkerTracker LiDarWorkerTracker,StatisticalFolder statistics, CountDownLatch latch,ErrorData errorData) {
         super("LiDarService" + LiDarWorkerTracker.getId());
         this.LiDarWorkerTracker = LiDarWorkerTracker;
         this.eventFutures = new ConcurrentHashMap<>();
         this.statistics = statistics;
         this.latch = latch;
+        this.lastTrackedObject=new ArrayList<>();
+        this.errorData = errorData;
 
     }
 
@@ -58,11 +64,13 @@ public class LiDarService extends MicroService {
                         this.LiDarWorkerTracker.status=STATUS.ERROR;
                         sendBroadcast(new CrashedBroadcast(this.getName(), this.getName()+" disconnected"));
                         terminate();
+                        this.errorData.addLidarDetection(getName(), recentObjects);
                     }
                 }
                 TrackedObjectsEvent e = new TrackedObjectsEvent(this.getName(), recentObjects);
                 statistics.addToTrackedObjects(recentObjects.size());
                 eventFutures.put(e,sendEvent(e));
+                this.lastTrackedObject=recentObjects;
             }
         }
         );
