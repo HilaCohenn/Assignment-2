@@ -74,7 +74,10 @@ public class CameraService extends MicroService {
                 }
                 DetectObjectsEvent e = new DetectObjectsEvent(this.getName(),detectedObjects);
                 statistics.addToDetectedObjcts(detectedObjects.getDetectedObjects().size());
-                eventFutures.put(e,sendEvent(e));
+                Future<?> future = sendEvent(e);
+                if (future != null) {
+                    eventFutures.put(e, future);
+                }
                 this.lastDetectedObjects=detectedObjects;
             }
         }
