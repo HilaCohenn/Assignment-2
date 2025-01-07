@@ -38,4 +38,28 @@ public class ErrorData {
         this.lidarDetection.put(lidarId, trackedObjects);
     }
 
+    public void addPose(Pose pose) {
+        this.poses.add(pose);
+    }
+
+    public String getError() {
+        return this.error;
+    }
+
+    public String getFaultySensor() {
+        return this.faultySensor;
+    }
+
+    public List<Pose> getPose() {
+        return this.poses;
+    }
+
+    public Map<String, StampedDetectedObjects> getCamaraFrames() {
+        return this.camaraFrames;
+    }
+
+    public Map<String,List<TrackedObject>> getLidarDetection() {
+        return this.lidarDetection;
+    }
+
 }

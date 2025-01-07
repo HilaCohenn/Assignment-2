@@ -100,7 +100,7 @@ public class GurionRockRunner {
             lidarServices.add(lidarService);
         }
 
-        PoseService poseService = new PoseService(gpsimu,latch);
+        PoseService poseService = new PoseService(gpsimu,latch,errorData);
         TimeService timeService = new TimeService(tickTime, duration, statistics,latch);
 
 
@@ -136,6 +136,9 @@ public class GurionRockRunner {
         }
 
         // Generate output file
+        if(errorData.getError()!=null)
+            ErrorOutPutHandler.generateErrorOutputFile(configFilePath, fusionSlam, statistics, errorData);
+        else
         OutputHandler.generateOutputFile(configFilePath, fusionSlam, statistics);
     }
 }

@@ -17,7 +17,7 @@ public class ErrorOutPutHandler {
 
     private static volatile boolean errorOccurred = false;
 
-    public static void generateErrorOutputFile(String configFilePath, FusionSlam fusionSlam, StatisticalFolder statistics, String error, String faultySensor, Map<String, List<DetectedObject>> lastFrames, List<Pose> poses) {
+    public static void generateErrorOutputFile(String configFilePath, FusionSlam fusionSlam, StatisticalFolder statistics, ErrorData errorData) {
         if (!errorOccurred) {
             synchronized (ErrorOutPutHandler.class) {
                 if (!errorOccurred) {
@@ -26,7 +26,7 @@ public class ErrorOutPutHandler {
                     String outputFilePath = Paths.get(new File(configFilePath).getParent(), "output_file.json").toString();
 
                     // Collect data
-                    JsonObject outputJson = collectData(fusionSlam, statistics, error, faultySensor, lastFrames, poses);
+                    JsonObject outputJson = collectData(fusionSlam, statistics, errorData);
 
                     // Write to output file
                     writeToFile(outputJson, outputFilePath);
@@ -35,9 +35,52 @@ public class ErrorOutPutHandler {
         }
     }
 
-    private static JsonObject collectData(FusionSlam fusionSlam, StatisticalFolder statistics, String error, String faultySensor, Map<String, List<DetectedObject>> lastFrames, List<Pose> poses) {
+    private static JsonObject collectData(FusionSlam fusionSlam, StatisticalFolder statistics, ErrorData errorData) {
         JsonObject outputJson = new JsonObject();
+        outputJson.addProperty("error", errorData.getError());
+        outputJson.addProperty("faultySensor", errorData.getFaultySensor());
+       
+         // Add camera frames
+         JsonObject cameraFramesJson = new JsonObject();
+         for (Map.Entry<String, StampedDetectedObjects> entry : errorData.getCamaraFrames().entrySet()) {
+             JsonObject frameJson = new JsonObject();
+             frameJson.addProperty("time", entry.getValue().getTime());
+             JsonArray detectedObjectsJson = new JsonArray();
+             for (DetectedObject detectedObject : entry.getValue().getDetectedObjects()) {
+                 JsonObject detectedObjectJson = new JsonObject();
+                 detectedObjectJson.addProperty("id", detectedObject.getId());
+                 detectedObjectJson.addProperty("description", detectedObject.getDescription());
+                 detectedObjectsJson.add(detectedObjectJson);
+             }
+             frameJson.add("detectedObjects", detectedObjectsJson);
+             cameraFramesJson.add(entry.getKey(), frameJson);
+         }
+         outputJson.add("cameraFrames", cameraFramesJson);
 
+                 // Add lidar detections
+        JsonObject lidarDetectionsJson = new JsonObject();
+        for (Map.Entry<String, List<TrackedObject>> entry : errorData.getLidarDetection().entrySet()) {
+            JsonArray trackedObjectsJson = new JsonArray();
+            for (TrackedObject trackedObject : entry.getValue()) {
+                JsonObject trackedObjectJson = new JsonObject();
+                trackedObjectJson.addProperty("id", trackedObject.getId());
+                trackedObjectJson.addProperty("description", trackedObject.getDescription());
+                trackedObjectsJson.add(trackedObjectJson);
+            }
+            lidarDetectionsJson.add(entry.getKey(), trackedObjectsJson);
+        }
+        outputJson.add("lidarDetections", lidarDetectionsJson);
+
+                // Add poses
+                JsonArray posesJson = new JsonArray();
+                for (Pose pose : errorData.getPose()) {
+                    JsonObject poseJson = new JsonObject();
+                    poseJson.addProperty("time", pose.getTime());
+                    poseJson.addProperty("x", pose.getX());
+                    poseJson.addProperty("y", pose.getY());
+                    posesJson.add(poseJson);
+                }
+                outputJson.add("poses", posesJson);
         // Add system runtime
         outputJson.addProperty("systemRuntime", statistics.getSystemRuntime().get());
 
@@ -49,7 +92,6 @@ public class ErrorOutPutHandler {
 
         // Add number of landmarks
         outputJson.addProperty("numLandmarks", statistics.getNumLandmarks().get());
-
         // Add landmarks
         JsonObject landmarksJson = new JsonObject();
         for (LandMark landmark : fusionSlam.getLandmarks()) {
@@ -70,44 +112,7 @@ public class ErrorOutPutHandler {
         }
         outputJson.add("landMarks", landmarksJson);
 
-        // Add error information
-        outputJson.addProperty("Error", error);
-        outputJson.addProperty("faultySensor", faultySensor);
-
-        // Add last frames
-        JsonObject lastFramesJson = new JsonObject();
-        JsonObject camerasJson = new JsonObject();
-        JsonObject lidarJson = new JsonObject();
-        for (Map.Entry<String, List<DetectedObject>> entry : lastFrames.entrySet()) {
-            JsonArray detectedObjectsJson = new JsonArray();
-            for (DetectedObject detectedObject : entry.getValue()) {
-                JsonObject detectedObjectJson = new JsonObject();
-                detectedObjectJson.addProperty("id", detectedObject.getId());
-                detectedObjectJson.addProperty("description", detectedObject.getDescription());
-                detectedObjectsJson.add(detectedObjectJson);
-            }
-            if (entry.getKey().startsWith("Camera")) {
-                camerasJson.add(entry.getKey(), detectedObjectsJson);
-            } else {
-                lidarJson.add(entry.getKey(), detectedObjectsJson);
-            }
-        }
-        lastFramesJson.add("cameras", camerasJson);
-        lastFramesJson.add("lidar", lidarJson);
-        outputJson.add("lastFrames", lastFramesJson);
-
-        // Add poses
-        JsonArray posesJson = new JsonArray();
-        for (Pose pose : poses) {
-            JsonObject poseJson = new JsonObject();
-            poseJson.addProperty("x", pose.getX());
-            poseJson.addProperty("y", pose.getY());
-            poseJson.addProperty("yaw", pose.getYaw());
-            posesJson.add(poseJson);
-        }
-        outputJson.add("poses", posesJson);
-
-        return outputJson;
+                return outputJson;
     }
 
     private static void writeToFile(JsonObject jsonObject, String fileName) {
