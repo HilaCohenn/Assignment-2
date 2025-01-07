@@ -136,6 +136,9 @@ public class GurionRockRunner {
         }
 
         // Generate output file
+        if(errorData.getError()!=null)
+            ErrorOutPutHandler.generateErrorOutputFile(configFilePath, fusionSlam, statistics, errorData);
+        else
         OutputHandler.generateOutputFile(configFilePath, fusionSlam, statistics);
     }
 }
