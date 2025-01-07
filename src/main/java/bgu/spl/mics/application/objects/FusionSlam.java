@@ -1,7 +1,7 @@
 package bgu.spl.mics.application.objects;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Iterator;
 
 /**
  * Manages the fusion of sensor data for simultaneous localization and mapping (SLAM).
@@ -12,14 +12,14 @@ public class FusionSlam {
     // Singleton instance holder
 
     private static class SingletonHolder {
-            private static FusionSlam instance = new FusionSlam();
+        private static FusionSlam instance = new FusionSlam();
     }
     private List<LandMark> landmarks;
     private List<Pose> poses;
     private List<TrackedObject> toBeProcessed;
     private StatisticalFolder statistics;
-    
-    private FusionSlam(){
+
+    private FusionSlam() {
         this.landmarks = new ArrayList<>();
         this.poses = new ArrayList<>();
         this.statistics = null;
@@ -27,54 +27,73 @@ public class FusionSlam {
     }
 
     public static FusionSlam getInstance(StatisticalFolder statistics) {
-        FusionSlam inst= SingletonHolder.instance;
+        FusionSlam inst = SingletonHolder.instance;
         inst.setStatistics(statistics);
         return inst;
     }
 
-    private void setStatistics(StatisticalFolder statistics){
-        if(this.statistics == null){
+    private void setStatistics(StatisticalFolder statistics) {
+        if (this.statistics == null) {
             this.statistics = statistics;
         }
-    }   
+    }
 
-    public void processLandMark(List<TrackedObject> trackedObjects){
-        for(TrackedObject trackedObject : trackedObjects){
-            if (!landMarkExists(trackedObject.getId())){
+    public void processLandMark(List<TrackedObject> trackedObjects) {
+        for (TrackedObject trackedObject : trackedObjects) {
+            if (!landMarkExists(trackedObject.getId())) {
                 addLandMark(trackedObject);
-            }
-            else {
+            } else {
                 updateLandmark(trackedObject);
             }
         }
     }
 
-    public boolean landMarkExists(String id){
-        for (LandMark landMark : landmarks){
-            if (landMark.getId().equals(id)){
+    public boolean landMarkExists(String id) {
+        for (LandMark landMark : landmarks) {
+            if (landMark.getId().equals(id)) {
                 return true;
             }
         }
         return false;
     }
 
-    public void updateLandmark(TrackedObject trackedObject){
-        for (LandMark landMark : landmarks){
-            if (landMark.getId().equals(trackedObject.getId())){
-                updateCoordinates(landMark, trackedObject.getCloudPoints());
+    public void updateLandmark(TrackedObject trackedObject) {
+        for (LandMark landMark : landmarks) {
+            if (landMark.getId().equals(trackedObject.getId())) {
                 Pose pose = getPoseByTime(trackedObject.getTime());
-                if (pose == null){
+                if (pose == null) {
                     toBeProcessed.add(trackedObject);
                     return;
                 }
-                landMark.setCoordinates(coordinateTransformer(trackedObject.getCloudPoints(), pose));
+
+                List<CloudPoint> newCloudPoints = coordinateTransformer(trackedObject.getCloudPoints(), pose);
+                List<CloudPoint> existingCloudPoints = landMark.getCoordinates();
+                List<CloudPoint> updatedCloudPoints = new ArrayList<>();
+
+                int minSize = Math.min(existingCloudPoints.size(), newCloudPoints.size());
+                for (int i = 0; i < minSize; i++) {
+                    CloudPoint newPoint = newCloudPoints.get(i);
+                    CloudPoint existingPoint = existingCloudPoints.get(i);
+
+                    double avgX = (newPoint.getX() + existingPoint.getX()) / 2;
+                    double avgY = (newPoint.getY() + existingPoint.getY()) / 2;
+
+                    updatedCloudPoints.add(new CloudPoint(avgX, avgY));
+                }
+
+                // Add any new points that were not in the existing list
+                if (newCloudPoints.size() > existingCloudPoints.size()) {
+                    updatedCloudPoints.addAll(newCloudPoints.subList(existingCloudPoints.size(), newCloudPoints.size()));
+                }
+
+                landMark.setCoordinates(updatedCloudPoints);
             }
         }
     }
 
-    public void addLandMark(TrackedObject trackedObject){
+    public void addLandMark(TrackedObject trackedObject) {
         Pose pose = getPoseByTime(trackedObject.getTime());
-        if (pose == null){
+        if (pose == null) {
             toBeProcessed.add(trackedObject);
             return;
         }
@@ -83,36 +102,23 @@ public class FusionSlam {
         this.statistics.addToLandMark(1);
     }
 
-    public List<CloudPoint> updateCoordinates(LandMark landmark, List<CloudPoint> coordinates) {
-        List<CloudPoint> newCoordinates = new ArrayList<>();
-        for (CloudPoint cloudPoint : coordinates){
-            for (CloudPoint points : landmark.getCoordinates()){
-                cloudPoint.setX((cloudPoint.getX()+points.getX())/2);
-                cloudPoint.setY((cloudPoint.getY()+points.getY())/2);
-        }
-    }
-    return newCoordinates;
-}
-
-    public Pose getPoseByTime (int time){
-        for (Pose pose : poses){
-            if (pose.getTime() == time){
+    public Pose getPoseByTime(int time) {
+        for (Pose pose : poses) {
+            if (pose.getTime() == time) {
                 return pose;
             }
         }
         return null;
     }
 
-    public void processPose (Pose pose){
+    public void processPose(Pose pose) {
         List<TrackedObject> newLandmarks = new ArrayList<>();
-        Iterator<TrackedObject> iterator = toBeProcessed.iterator();
-        while (iterator.hasNext()) {
-            TrackedObject trackedObject = iterator.next();
+        for (TrackedObject trackedObject : toBeProcessed) {
             if (trackedObject.getTime() == pose.getTime()) {
                 newLandmarks.add(trackedObject);
-                iterator.remove(); // Safely remove the element using the iterator
             }
         }
+        toBeProcessed.removeAll(newLandmarks);
         processLandMark(newLandmarks);
         poses.add(pose);
     }
@@ -152,9 +158,4 @@ public class FusionSlam {
     public List<Pose> getPoses() {
         return poses;
     }
-    
 }
-
-
-
-
