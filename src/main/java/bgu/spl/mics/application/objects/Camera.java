@@ -47,6 +47,15 @@ public Camera(int id, int frequency,String key,String path) {
     initDetectedObjects(path);
     
 }
+
+public Camera(int id, int frequency,List<StampedDetectedObjects> list ) {
+    this.id = id;
+    this.frequency = frequency;
+    this.camara_key= "";
+    this.status = STATUS.UP;
+    this.detectedObjectsList = list; 
+    
+}
 private void initDetectedObjects (String path){
     Gson gson = new Gson();
     JsonObject o = FileReaderUtil.readJson(path);

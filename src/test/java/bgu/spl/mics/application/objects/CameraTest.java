@@ -8,6 +8,7 @@ import bgu.spl.mics.application.services.*;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,7 +22,45 @@ class CameraTest {
 
     @BeforeEach
     void setUp() {
-        camera = new Camera(1, 2, "camera1", "src/test/example_input/camera_data.json");
+        // Initialize the camera with test data
+        List<StampedDetectedObjects> detectedObjectsList = new ArrayList<>();
+        detectedObjectsList.add(new StampedDetectedObjects(2, List.of(
+                new DetectedObject("Wall_1", "Wall")
+        )));
+        detectedObjectsList.add(new StampedDetectedObjects(4, List.of(
+                new DetectedObject("Wall_3", "Wall"),
+                new DetectedObject("Chair_Base_1", "Chair Base")
+        )));
+        detectedObjectsList.add(new StampedDetectedObjects(6, List.of(
+                new DetectedObject("Wall_4", "Wall"),
+                new DetectedObject("Circular_Base_1", "Circular Base")
+        )));
+        detectedObjectsList.add(new StampedDetectedObjects(7, List.of(
+                new DetectedObject("Door", "Door")
+        )));
+        detectedObjectsList.add(new StampedDetectedObjects(8, List.of(
+                new DetectedObject("Wall_5", "Wall")
+        )));
+        detectedObjectsList.add(new StampedDetectedObjects(10, List.of(
+                new DetectedObject("Wall_1", "Wall")
+        )));
+        detectedObjectsList.add(new StampedDetectedObjects(12, List.of(
+                new DetectedObject("Wall_3", "Wall")
+        )));
+        detectedObjectsList.add(new StampedDetectedObjects(14, List.of(
+                new DetectedObject("Wall_5", "Wall")
+        )));
+        detectedObjectsList.add(new StampedDetectedObjects(16, List.of(
+                new DetectedObject("Wall_4", "Wall")
+        )));
+        detectedObjectsList.add(new StampedDetectedObjects(18, List.of(
+                new DetectedObject("Chair_Base_1", "Chair Base")
+        )));
+        detectedObjectsList.add(new StampedDetectedObjects(20, List.of(
+                new DetectedObject("Circular_Base_1", "Circular Base")
+        )));
+
+        camera = new Camera(1, 2, "camera1", detectedObjectsList);
         cameraService = new CameraService(camera, new StatisticalFolder(), latch, errorData);
         messageBus = MessageBusImpl.getInstance();
         messageBus.register(cameraService);
@@ -51,7 +90,8 @@ class CameraTest {
             assertEquals(expected.getDescription(), actual.getDescription(), "The detected object descriptions should match");
         }
     }
-        @Test
+
+    @Test
     void testGetDetectedObjectsByDifferentTime() {
         int objectTime = 4;
         int cameraFrequency = 2;
@@ -75,5 +115,4 @@ class CameraTest {
             assertEquals(expected.getDescription(), actual.getDescription(), "The detected object descriptions should match");
         }
     }
- }
-
+}

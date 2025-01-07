@@ -68,7 +68,7 @@
                 <configuration>
                     <mainClass>bgu.spl.mics.application.GurionRockRunner</mainClass>
                     <arguments>
-                        <argument>example_input_2/configuration_file.json</argument>
+                        <argument>example_input/configuration_file.json</argument>
                     </arguments>
                 </configuration>
             </plugin>
