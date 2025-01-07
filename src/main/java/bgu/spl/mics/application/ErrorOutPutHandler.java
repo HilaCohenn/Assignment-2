@@ -13,13 +13,13 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-public class ErrorOutputHandler {
+public class ErrorOutPutHandler {
 
     private static volatile boolean errorOccurred = false;
 
     public static void generateErrorOutputFile(String configFilePath, FusionSlam fusionSlam, StatisticalFolder statistics, String error, String faultySensor, Map<String, List<DetectedObject>> lastFrames, List<Pose> poses) {
         if (!errorOccurred) {
-            synchronized (ErrorOutputHandler.class) {
+            synchronized (ErrorOutPutHandler.class) {
                 if (!errorOccurred) {
                     errorOccurred = true;
                     // Determine the output file path
