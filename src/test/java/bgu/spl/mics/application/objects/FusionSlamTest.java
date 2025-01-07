@@ -9,10 +9,11 @@ import static org.junit.jupiter.api.Assertions.*;
 public class FusionSlamTest {
 
     private FusionSlam fusionSlam;
+    private StatisticalFolder statistics=new StatisticalFolder();
 
     @BeforeEach
     public void setUp() {
-        fusionSlam = FusionSlam.getInstance();
+        fusionSlam = FusionSlam.getInstance(statistics);
         fusionSlam.getLandmarks().clear(); // Clear existing landmarks
         fusionSlam.getPoses().clear(); // Clear existing poses
     }

@@ -13,14 +13,16 @@ class CameraServiceTest {
     private Camera camera;
     private CameraService cameraService;
     private MessageBus messageBus;
+    private CountDownLatch latch=new CountDownLatch(5);
+    private ErrorData errorData= new ErrorData();
+
 
     @BeforeEach
     void setUp() {
-        camera = new Camera(1, 2, "example_input\\camera_data.json"); // Camera with ID 1
-
+        camera = new Camera(1, 2, "camara1","example_input\\camera_data.json");
         // make sure the path is correct
 
-        cameraService = new CameraService(camera, null);
+        cameraService = new CameraService(camera, null, latch, errorData);
         messageBus = MessageBusImpl.getInstance();
         messageBus.register(cameraService);
     }
