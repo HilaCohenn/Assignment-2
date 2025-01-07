@@ -19,6 +19,8 @@ public interface MessageBus {
      * @param m    The subscribing micro-service.
      */
     <T> void subscribeEvent(Class<? extends Event<T>> type, MicroService m);
+    //@PRE: type != null && m != null
+    //@POST: subscriptions.containsKey(type) && subscriptions.get(type).contains(m)
 
     /**
      * Subscribes {@code m} to receive {@link Broadcast}s of type {@code type}.
@@ -27,7 +29,8 @@ public interface MessageBus {
      * @param m    	The subscribing micro-service.
      */
     void subscribeBroadcast(Class<? extends Broadcast> type, MicroService m);
-
+    //@PRE: type != null && m != null
+    //@POST: subscriptions.containsKey(type) && subscriptions.get(type).contains(m)
     /**
      * Notifies the MessageBus that the event {@code e} is completed and its
      * result was {@code result}.
@@ -39,7 +42,8 @@ public interface MessageBus {
      * @param result The resolved result of the completed event.
      */
     <T> void complete(Event<T> e, T result);
-
+        //@PRE: e != null && eventFutures.containsKey(e)
+        //@POST: !eventFutures.containsKey(e)
     /**
      * Adds the {@link Broadcast} {@code b} to the message queues of all the
      * micro-services subscribed to {@code b.getClass()}.
@@ -47,7 +51,8 @@ public interface MessageBus {
      * @param b 	The message to added to the queues.
      */
     void sendBroadcast(Broadcast b);
-
+        //@PRE: b != null
+        //@POST: for all MicroService m in subscriptions.get(b.getClass()), microServiceQueues.get(m).contains(b)
     /**
      * Adds the {@link Event} {@code e} to the message queue of one of the
      * micro-services subscribed to {@code e.getClass()} in a round-robin
@@ -59,7 +64,8 @@ public interface MessageBus {
      * 	       null in case no micro-service has subscribed to {@code e.getClass()}.
      */
     <T> Future<T> sendEvent(Event<T> e);
-
+        //@PRE: e != null
+        //@POST: (return == null || eventFutures.containsKey(e))
     /**
      * Allocates a message-queue for the {@link MicroService} {@code m}.
      * <p>

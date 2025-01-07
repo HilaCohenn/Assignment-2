@@ -12,12 +12,17 @@ public class FusionSlam {
     // Singleton instance holder
 
     private static class SingletonHolder {
-        private static FusionSlam instance = new FusionSlam();
+    private static FusionSlam instance = new FusionSlam();
     }
     private List<LandMark> landmarks;
     private List<Pose> poses;
     private List<TrackedObject> toBeProcessed;
     private StatisticalFolder statistics;
+
+     //@INV: landmarks != null && poses != null && toBeProcessed != null && 
+    //      for all LandMark lm in landmarks, lm != null && 
+    //      for all Pose p in poses, p != null && 
+    //      for all TrackedObject t in toBeProcessed, t != null
 
     private FusionSlam() {
         this.landmarks = new ArrayList<>();
@@ -39,6 +44,8 @@ public class FusionSlam {
     }
 
     public void processLandMark(List<TrackedObject> trackedObjects) {
+        //@PRE: trackedObjects != null && for all TrackedObject t in trackedObjects, t != null
+        //@POST: landmarks.size() >= @PRE(landmarks.size())
         for (TrackedObject trackedObject : trackedObjects) {
             if (!landMarkExists(trackedObject.getId())) {
                 addLandMark(trackedObject);
@@ -49,6 +56,7 @@ public class FusionSlam {
     }
 
     public boolean landMarkExists(String id) {
+        
         for (LandMark landMark : landmarks) {
             if (landMark.getId().equals(id)) {
                 return true;
@@ -58,6 +66,8 @@ public class FusionSlam {
     }
 
     public void updateLandmark(TrackedObject trackedObject) {
+        //@PRE: trackedObject != null && trackedObject.getId() != null && trackedObject.getCloudPoints() != null
+        //@POST: landmarks.size() == @PRE(landmarks.size())
         for (LandMark landMark : landmarks) {
             if (landMark.getId().equals(trackedObject.getId())) {
                 Pose pose = getPoseByTime(trackedObject.getTime());
@@ -92,6 +102,8 @@ public class FusionSlam {
     }
 
     public void addLandMark(TrackedObject trackedObject) {
+        //@PRE: trackedObject != null && trackedObject.getId() != null && trackedObject.getCloudPoints() != null
+        //@POST: landmarks.size() == @PRE(landmarks.size()) + 1
         Pose pose = getPoseByTime(trackedObject.getTime());
         if (pose == null) {
             toBeProcessed.add(trackedObject);

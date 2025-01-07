@@ -77,6 +77,12 @@ public STATUS getStatus() {
 }
 
 public  StampedDetectedObjects getDetectedObjectsbyTime(int time) {
+    //@INV: detectedObjectsList != null && detectedObjectsList.size() >= 0 && 
+    //      for all i, 0 <= i < detectedObjectsList.size(), detectedObjectsList.get(i) != null
+
+    //@PRE: time >= 0 && frequency > 0 && detectedObjectsList != null && detectedObjectsList.size() > 0
+    //@POST: (return == null && status == STATUS.DOWN) || 
+    //       (return != null && return.getTime() == (time - frequency))
     int current = time - frequency;
     int last = this.detectedObjectsList.get(this.detectedObjectsList.size()-1).getTime();
     if(current>last) {
