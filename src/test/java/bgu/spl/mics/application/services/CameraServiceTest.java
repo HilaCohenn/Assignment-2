@@ -13,16 +13,13 @@ class CameraServiceTest {
     private Camera camera;
     private CameraService cameraService;
     private MessageBus messageBus;
-    private CountDownLatch latch=new CountDownLatch(5);
-    private ErrorData errorData= new ErrorData();
-
+    private CountDownLatch latch = new CountDownLatch(1);
+    private ErrorData errorData = new ErrorData();
 
     @BeforeEach
     void setUp() {
-        camera = new Camera(1, 2, "camara1","example_input\\camera_data.json");
-        // make sure the path is correct
-
-        cameraService = new CameraService(camera, null, latch, errorData);
+        camera = new Camera(1, 2, "camera1", "src/test/example_input/camera_data.json");
+        cameraService = new CameraService(camera, new StatisticalFolder(), latch, errorData);
         messageBus = MessageBusImpl.getInstance();
         messageBus.register(cameraService);
     }
@@ -33,12 +30,10 @@ class CameraServiceTest {
         // 1. The camera status is set to UP (not ERROR or DOWN).
         // 2. The CameraService is subscribed to TickBroadcasts.
         assertEquals(STATUS.UP, camera.getStatus());
-
-        // Simulate detected objects at time 5
         int currentTime = 5;
         StampedDetectedObjects detectedObjects = camera.getDetectedObjectsbyTime(currentTime);
         assertNotNull(detectedObjects);
-
+        assertFalse(detectedObjects.getDetectedObjects().isEmpty(), "Detected objects should not be empty");
         TickBroadcast tick = new TickBroadcast(currentTime);
         messageBus.sendBroadcast(tick);
 
@@ -65,25 +60,18 @@ class CameraServiceTest {
 
     @Test
     void testCameraErrorStatus() {
-        // Preconditions:
-        // 1. The camera is operational initially.
-        // 2. Detected objects contain one with ID "ERROR".
-
-        // Simulate detected objects at time 10 with an error
         int currentTime = 10;
         StampedDetectedObjects detectedObjects = camera.getDetectedObjectsbyTime(currentTime);
         assertNotNull(detectedObjects);
-
-        // Manually add an error object to the detected objects list
+        assertFalse(detectedObjects.getDetectedObjects().isEmpty(), "Detected objects should not be empty");
         detectedObjects.getDetectedObjects().add(new DetectedObject("ERROR", "Critical Error"));
-
         TickBroadcast tick = new TickBroadcast(currentTime);
         messageBus.sendBroadcast(tick);
 
         // Postconditions:
-        // 1. The camera status is set to ERROR.
-        // 2. A CrashedBroadcast is sent.
-        // 3. The CameraService terminates.
+        // 1. CameraService processes the broadcast.
+        // 2. A CrashedBroadcast is sent for the error.
+        // 3. The error data is processed correctly.
 
         try {
             Message message = messageBus.awaitMessage(cameraService);
@@ -98,7 +86,7 @@ class CameraServiceTest {
         }
 
         // Invariants:
-        // 1. The camera cannot process any further events or broadcasts after entering the ERROR state.
-        // 2. The CrashedBroadcast must include accurate error details.
+        // 1. The CameraService must remain subscribed to TickBroadcasts until terminated.
+        // 2. The message queue for CameraService should only contain relevant messages.
     }
 }

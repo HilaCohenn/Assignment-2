@@ -29,7 +29,7 @@ public class TimeService extends MicroService {
      */
     public TimeService(int TickTime, int Duration, StatisticalFolder statistics,CountDownLatch latch) {
         super("TimeService");
-        this.TickTime = TickTime *100 ;
+        this.TickTime = TickTime *1000 ;
         this.Duration = Duration;
         this.statistics = statistics;
         this.latch = latch;
