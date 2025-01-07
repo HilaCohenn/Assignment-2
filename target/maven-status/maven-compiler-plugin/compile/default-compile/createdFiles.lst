@@ -40,6 +40,7 @@ bgu\spl\mics\example\ServiceCreator.class
 bgu\spl\mics\application\objects\StampedCloudPoints.class
 bgu\spl\mics\Callback.class
 bgu\spl\mics\Message.class
+bgu\spl\mics\application\ErrorOutPutHandler.class
 bgu\spl\mics\application\services\PoseService.class
 bgu\spl\mics\FileReaderUtil.class
 bgu\spl\mics\MessageBusImpl$1.class
