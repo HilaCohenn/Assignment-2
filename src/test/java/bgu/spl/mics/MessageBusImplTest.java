@@ -55,7 +55,6 @@ class MessageBusImplTest {
     @Test
     void testComplete() {
         messageBus.subscribeEvent((Class<? extends Event<String>>) testEvent.getClass(), microService1);
-        messageBus.sendEvent(testEvent);
         Future<String> future = messageBus.sendEvent(testEvent);
         assertNotNull(future, "The future object should not be null");
         messageBus.complete(testEvent, "Completed");
