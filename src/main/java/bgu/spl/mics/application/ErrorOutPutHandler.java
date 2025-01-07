@@ -83,7 +83,7 @@ public class ErrorOutPutHandler {
             for (DetectedObject detectedObject : entry.getValue()) {
                 JsonObject detectedObjectJson = new JsonObject();
                 detectedObjectJson.addProperty("id", detectedObject.getId());
-                detectedObjectJson.addProperty("type", detectedObject.getType());
+                detectedObjectJson.addProperty("description", detectedObject.getDescription());
                 detectedObjectsJson.add(detectedObjectJson);
             }
             if (entry.getKey().startsWith("Camera")) {
