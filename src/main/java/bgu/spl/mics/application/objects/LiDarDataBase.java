@@ -39,32 +39,35 @@ public class LiDarDataBase {
         this.cloudPoints = new ArrayList<>();
         initCloudPoints(path);
     }
-    private void initCloudPoints(String filePath){
+    private void initCloudPoints(String filePath) {
         Gson gson = new Gson();
-        try {
-        FileReader lidars = new FileReader(filePath);
-        Type listType = new TypeToken<List<StampedCloudPoints>>(){}.getType();
-        List<JsonObject> jsonObjects = gson.fromJson(lidars, listType);
-        for (JsonObject jsonObject : jsonObjects) {
-            int time = jsonObject.get("time").getAsInt();
-            String id = jsonObject.get("id").getAsString();
-            JsonArray cloudPointsdata = jsonObject.getAsJsonArray("cloudPoints");
-            List<CloudPoint> points = new ArrayList<>();
-                for (JsonElement p : cloudPointsdata) {
-                JsonArray pointArray = p.getAsJsonArray();
+        try (FileReader lidars = new FileReader(filePath)) {
+            Type listType = new TypeToken<List<JsonObject>>() {}.getType();
+            List<JsonObject> jsonObjects = gson.fromJson(lidars, listType);
+            for (JsonObject jsonObject : jsonObjects) {
+                int time = jsonObject.get("time").getAsInt();
+                String id = jsonObject.get("id").getAsString();
+                JsonArray cloudPointsData = jsonObject.getAsJsonArray("cloudPoints");
+                List<CloudPoint> points = new ArrayList<>();
+                for (JsonElement p : cloudPointsData) {
+                    JsonArray pointArray = p.getAsJsonArray();
                     double x = pointArray.get(0).getAsDouble();
                     double y = pointArray.get(1).getAsDouble();
                     points.add(new CloudPoint(x, y));
                 }
-                this.cloudPoints.add(new StampedCloudPoints(time,id,points));
+                this.cloudPoints.add(new StampedCloudPoints(time, id, points));
             }
         } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     //get the cloud points of a specific object
     public StampedCloudPoints getCloudPoint(DetectedObject d,int time) {
+        System.out.println("getCloudPoint" + d.getId() + " " + time);
+        System.out.println("cloudPoints size" + this.cloudPoints.size());
             for (StampedCloudPoints cloudPoint : this.cloudPoints) {
+                System.out.println(cloudPoint.getId() + " " + cloudPoint.getTime());
             if (cloudPoint.getId().equals(d.getId())&&cloudPoint.getTime()==time) {
                return cloudPoint;
             }

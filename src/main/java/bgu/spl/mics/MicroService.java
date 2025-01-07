@@ -141,6 +141,8 @@ public abstract class MicroService implements Runnable {
     protected final void terminate() {
         this.terminated = true;
         sendBroadcast(new TerminatedBroadcast(this.name));   
+        System.out.println("MicroService: " + this.name + " terminated");
+        // Thread.currentThread().interrupt();
     }
 
     /**
@@ -171,6 +173,7 @@ public abstract class MicroService implements Runnable {
                 //check this
             }
         }
+        System.out.println("MicroService: " + this.name + " terminated123");
         messageBus.unregister(this);
     }
 

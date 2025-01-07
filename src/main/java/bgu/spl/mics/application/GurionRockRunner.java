@@ -122,7 +122,6 @@ public class GurionRockRunner {
  
         //start all threads after all services are initialized
         for (Thread thread : threads) {
-                thread.start();
             thread.start();
         }
 

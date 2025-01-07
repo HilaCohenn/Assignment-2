@@ -51,7 +51,7 @@ public class LiDarService extends MicroService {
             if(this.LiDarWorkerTracker.status==STATUS.DOWN){
                 terminate();
             }
-            if (recentObjects != null) {
+            if (recentObjects != null && !recentObjects.isEmpty()) {
                 for(TrackedObject detect: recentObjects){
                     if(detect.getId().equals("ERROR"))
                     {
