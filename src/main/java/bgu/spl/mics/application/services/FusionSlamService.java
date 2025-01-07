@@ -55,10 +55,9 @@ public class FusionSlamService extends MicroService {
             
         });
 
-        this.subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast terminate) -> {
-            if (!terminate.getSender().equals("TimeService")) {
-                numServicesTerminated.incrementAndGet();
-            }});
+        this.subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast crashed) -> {
+            terminate();
+        });
 
         this.subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast terminate) -> {
             if(!terminate.getSender().equals("TimeService"))
