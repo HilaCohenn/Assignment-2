@@ -11,7 +11,7 @@ import java.util.concurrent.CountDownLatch;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class CameraServiceTest {
+class CameraTest {
 
     private Camera camera;
     private CameraService cameraService;
@@ -59,7 +59,7 @@ class CameraServiceTest {
 
         StampedDetectedObjects expectedObjects = new StampedDetectedObjects(objectTime, List.of(
                 new DetectedObject("Wall_3", "Wall"),
-                new DetectedObject("Wall_4", "Wall")
+                new DetectedObject("Chair_Base_1", "Chair Base")
         ));
 
         StampedDetectedObjects actualObjects = camera.getDetectedObjectsbyTime(queryTime);
