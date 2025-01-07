@@ -1,10 +1,5 @@
 package bgu.spl.mics.application.objects;
 
-import bgu.spl.mics.application.objects.Camera;
-import bgu.spl.mics.application.objects.DetectedObject;
-import bgu.spl.mics.application.objects.StampedDetectedObjects;
-import bgu.spl.mics.application.objects.ErrorData;
-import bgu.spl.mics.application.objects.StatisticalFolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import bgu.spl.mics.MessageBus;
