@@ -49,16 +49,18 @@ public class MessageBusImpl implements MessageBus {
         }
      }
 
-	@Override
-	public void sendBroadcast(Broadcast b) {
-	    ConcurrentLinkedQueue<MicroService> microServices = subscriptions.get(b.getClass());
-        if (microServices != null) {
-            for (MicroService m : microServices) {
-                System.out.println("Sending broadcast " + b.getClass().getSimpleName() + " to " + m.getName());
-                microServiceQueues.get(m).add(b);
-            }
-        }
-	}
+     @Override
+     public void sendBroadcast(Broadcast b) {
+         ConcurrentLinkedQueue<MicroService> microServices = subscriptions.get(b.getClass());
+         if (microServices != null) {
+             for (MicroService m : microServices) {
+                 BlockingQueue<Message> queue = microServiceQueues.get(m);
+                 if (queue != null) {
+                     System.out.println("Sending broadcast " + b.getClass().getSimpleName() + " to " + m.getName());
+                     queue.add(b);
+                 }
+             }
+         }
 
 	
 	@Override

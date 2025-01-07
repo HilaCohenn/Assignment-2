@@ -1,7 +1,7 @@
 package bgu.spl.mics.application.objects;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Iterator;
 
 /**
  * Manages the fusion of sensor data for simultaneous localization and mapping (SLAM).
@@ -105,10 +105,12 @@ public class FusionSlam {
 
     public void processPose (Pose pose){
         List<TrackedObject> newLandmarks = new ArrayList<>();
-        for (TrackedObject trackedObject : toBeProcessed){
-            if (trackedObject.getTime() == pose.getTime()){
+        Iterator<TrackedObject> iterator = toBeProcessed.iterator();
+        while (iterator.hasNext()) {
+            TrackedObject trackedObject = iterator.next();
+            if (trackedObject.getTime() == pose.getTime()) {
                 newLandmarks.add(trackedObject);
-                toBeProcessed.remove(trackedObject);
+                iterator.remove(); // Safely remove the element using the iterator
             }
         }
         processLandMark(newLandmarks);

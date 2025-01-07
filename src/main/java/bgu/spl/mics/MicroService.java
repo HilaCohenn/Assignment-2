@@ -111,8 +111,10 @@ public abstract class MicroService implements Runnable {
      * @param b The broadcast message to send
      */
     protected final void sendBroadcast(Broadcast b) {
-        System.out.println("MicroService: " + this.name + " sent broadcast: " + b.getClass().getName());
-        messageBus.sendBroadcast(b);
+        if (!terminated) {
+            System.out.println("MicroService: " + this.name + " sent broadcast: " + b.getClass().getName());
+            messageBus.sendBroadcast(b);
+        }
     }
 
     /**
@@ -139,7 +141,7 @@ public abstract class MicroService implements Runnable {
      * message.
      */
     protected final void terminate() {
-        this.terminated = true;
+        terminated = true;
         sendBroadcast(new TerminatedBroadcast(this.name));   
         System.out.println("MicroService: " + this.name + " terminated");
         // Thread.currentThread().interrupt();
