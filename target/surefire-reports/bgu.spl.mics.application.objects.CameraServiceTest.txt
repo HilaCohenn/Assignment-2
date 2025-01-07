@@ -1,4 +1,8 @@
 -------------------------------------------------------------------------------
 Test set: bgu.spl.mics.application.objects.CameraServiceTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.077 s - in bgu.spl.mics.application.objects.CameraServiceTest
+Tests run: 2, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.094 s <<< FAILURE! - in bgu.spl.mics.application.objects.CameraServiceTest
+testGetDetectedObjectsByDifferentTime  Time elapsed: 0.073 s  <<< FAILURE!
+org.opentest4j.AssertionFailedError: The detected object IDs should match ==> expected: <Wall_4> but was: <Chair_Base_1>
+	at bgu.spl.mics.application.objects.CameraServiceTest.testGetDetectedObjectsByDifferentTime(CameraTest.java:74)
+
