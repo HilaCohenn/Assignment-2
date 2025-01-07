@@ -15,7 +15,7 @@ class CameraServiceTest {
 
     @BeforeEach
     void setUp() {
-        camera = new Camera(1, 2, "./camera_data.json"); // Camera with ID 1
+        camera = new Camera(1, 2, "example_input\\camera_data.json"); // Camera with ID 1
 
         // make sure the path is correct
 
