@@ -38,4 +38,8 @@ public class ErrorData {
         this.lidarDetection.put(lidarId, trackedObjects);
     }
 
+    public void addPose(Pose pose) {
+        this.poses.add(pose);
+    }
+
 }

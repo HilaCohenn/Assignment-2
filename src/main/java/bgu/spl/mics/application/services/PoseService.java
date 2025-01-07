@@ -8,7 +8,7 @@ import bgu.spl.mics.application.objects.GPSIMU;
 import bgu.spl.mics.application.objects.STATUS;
 import bgu.spl.mics.*;
 import bgu.spl.mics.application.objects.Pose;
-
+import bgu.spl.mics.application.objects.ErrorData;
 
 /**
  * PoseService is responsible for maintaining the robot's current pose (position and orientation)
@@ -19,17 +19,19 @@ public class PoseService extends MicroService {
     private GPSIMU gpsimu;
     private final ConcurrentHashMap<Event<?>,Future<?>> eventFutures;
     private CountDownLatch latch;
+    private ErrorData errorData;
     
     /**
      * Constructor for PoseService.
      *
      * @param gpsimu The GPSIMU object that provides the robot's pose data.
      */
-    public PoseService(GPSIMU gpsimu, CountDownLatch latch) {
+    public PoseService(GPSIMU gpsimu, CountDownLatch latch, ErrorData errorData) {
         super("PoseService");
         this.gpsimu = gpsimu;
         this.eventFutures = new ConcurrentHashMap<>();
         this.latch = latch;
+        this.errorData = errorData;
     }
 
     /**
@@ -45,6 +47,7 @@ public class PoseService extends MicroService {
             if(poses != null){
                 PoseEvent e = new PoseEvent(currentTime, poses);
                 eventFutures.put(e,sendEvent(e));
+                this.errorData.addPose(poses);
             }
             if(this.gpsimu.status==STATUS.DOWN){
                 terminate();

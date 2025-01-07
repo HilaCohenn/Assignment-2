@@ -100,7 +100,7 @@ public class GurionRockRunner {
             lidarServices.add(lidarService);
         }
 
-        PoseService poseService = new PoseService(gpsimu,latch);
+        PoseService poseService = new PoseService(gpsimu,latch,errorData);
         TimeService timeService = new TimeService(tickTime, duration, statistics,latch);
 
 
